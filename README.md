@@ -67,4 +67,64 @@ that are correct and efficient, while being easy to implement.
 
 ### 1.3.3 Demonstrating Incorrectness
 
-# PAGE 30
+* The best way to prove that an algorithm is incorrect is to produce an instance on which it yields an incorrect answer. Such instances are called counterexamples. No rational person will ever defend the correctness of an algorithm after a counter-example has been identified. Very simple instances can instantly defeat reasonable-looking heuristics with a quick touch ́e. Good counterexamples have two important properties:
+
+    * **Verifiability** – To demonstrate that a particular instance is a counterex- ample to a particular algorithm, you must be able to (1) calculate what answer your algorithm will give in this instance, and (2) display a better answer so as to prove that the algorithm didn’t find it.
+
+    * Simplicity – **Good counter-examples have all unnecessary details stripped away**. They make clear exactly why the proposed algorithm fails. Simplicity is important because you must be able to hold the given instance in your head in order to reason about it. Once a counterexample has been found, it is worth simplifying it down to its essence. For example, the counterexample of Figure 1.6(l) could have been made simpler and better by reducing the number of overlapped segments from five to two.
+
+* Think small – Note that the robot tour counter-examples I presented boiled down to six points or less, and the scheduling counter-examples to only three intervals. This is indicative of the fact that when algorithms fail, there is usually a very simple example on which they fail. Amateur algorists tend to draw a big messy instance and then stare at it helplessly. **The pros look carefully at several small examples**, because they are easier to verify and reason about.
+
+* Think exhaustively – There are usually only a small number of possible instances for the first non-trivial value of n. For example, there are only three distinct ways two intervals on the line can occur: as disjoint intervals, as overlapping intervals, and as properly nesting intervals, one within the other. All cases of three intervals (including counter-examples to both of the movie heuristics) can be systematically constructed by adding a third segment in each possible way to these three instances.
+
+* Hunt for the weakness – If a proposed algorithm is of the form “always take the biggest” (better known as the greedy algorithm), think about why that might prove to be the wrong thing to do. In particular, . . .
+
+* Go for a tie – A devious way to break a greedy heuristic is to provide instances where everything is the same size. Suddenly the heuristic has nothing to base its decision on, and perhaps has the freedom to return something suboptimal as the answer.
+
+### 1.4 Induction and Recursion
+
+* Failure to find a counterexample to a given algorithm does not mean “it is obvious” that the algorithm is correct. A proof or demonstration of correctness is needed. Often mathematical induction is the method of choice.   
+
+* When I first learned about mathematical induction it seemed like complete magic. You proved a formula like $\sum_{i=1}^{n} i = n(n+1)/2$ for some basis case like n = 1 or 2, then assumed it was true all the way to n−1 before proving it was in fact true for general n using the assumption. That was a proof? Ridiculous!
+
+* When I first learned the programming technique of recursion it also seemed like complete magic. The program tested whether the input argument was some basis case like 1 or 2. If not, you solved the bigger case by breaking it into pieces and calling the subprogram itself to solve these pieces. That was a program? Ridiculous!
+
+* The reason both seemed like magic is because recursion is **mathematical induction in action**. In both, we have general and boundary conditions, with the general condition breaking the problem into smaller and smaller pieces. The initial or boundary condition terminates the recursion. Once you understand either recursion or induction, you should be able to see why the other one also works.
+
+* I’ve heard it said that a computer scientist is a mathematician who only knows how to prove things by induction. This is partially true because computer scientists are lousy at proving things, but primarily because so many of the algorithms we study are either recursive or incremental.
+
+* A proof by induction consists of two cases. The first, the base case (or basis), proves the statement for n = 0 without assuming any knowledge of other cases. The second case, the induction step, proves that if the statement holds for any given case n = k, then it must also hold for the next case n = k + 1. These two steps establish that the statement holds for every natural number n.[3] The base case does not necessarily begin with n = 0, but often with n = 1, and possibly with any fixed natural number n = N, establishing the truth of the statement for all natural numbers n ≥ N.
+
+* Consider the correctness of insertion sort, which we introduced at the be- ginning of this chapter. The reason it is correct can be shown inductively:
+
+    * The basis case consists of a single element, and by definition a one-element array is completely sorted.
+
+    * We assume that the first n − 1 elements of array A are completely sorted after n − 1 iterations of insertion sort.
+
+    * To insert one last element x to A, we find where it goes, namely the unique spot between the biggest element less than or equal to x and the smallest element greater than x. This is done by moving all the greater elements back by one position, creating room for x in the desired location.
+
+* One must be suspicious of inductive proofs, however, because very subtle reasoning errors can creep in. The first are boundary errors. For example, our insertion sort correctness proof above boldly stated that there was a unique place to insert x between two elements, when our basis case was a single-element array. Greater care is needed to properly deal with the special cases of inserting the minimum or maximum elements.
+
+* The second and more common class of inductive proof errors concerns cava- lier extension claims. Adding one extra item to a given problem instance might cause the entire optimal solution to change. This was the case in our scheduling problem (see Figure 1.8). The optimal schedule after inserting a new segment may contain none of the segments of any particular optimal solution prior to insertion. Boldly ignoring such difficulties can lead to very convincing inductive proofs of incorrect algorithms.
+
+### 1.5.1 Combinatorial Objects
+
+* Modeling is the art of formulating your application in terms of precisely de- scribed, well-understood problems. Proper modeling is the key to applying algorithmic design techniques to real-world problems. Indeed, proper model- ing can eliminate the need to design or even implement algorithms, by relating your application to what has been done before. Proper modeling is the key to effectively using the “Hitchhiker’s Guide” in Part II of this book.
+
+* Odds are very good that others have probably stumbled upon any algorithmic problem you care about, perhaps in substantially different contexts. But to find out what is known about your particular “widget optimization problem,” you can’t hope to find it in a book under widget. You must first formulate widget optimization in terms of computing properties of common structures such as those described below:
+
+    * Permutations are arrangements, or orderings, of items. For example, {1,4,3,2} and {4,3,2,1} are two distinct permutations of the same set of four integers. We have already seen permutations in the robot opti- mization problem, and in sorting. Permutations are likely the object in question whenever your problem seeks an “arrangement,” “tour,” “order- ing,” or “sequence.”
+
+    * Subsets/Combination represent selections from a set of items. For example, {1,3,4} and {2} are two distinct subsets of the first four integers. Order does not matter in subsets the way it does with permutations, so the subsets {1, 3, 4} and {4, 3, 1} would be considered identical. Subsets arose as can- didate solutions in the movie scheduling problem. They are likely the object in question whenever your problem seeks a “cluster,” “collection,” “committee,” “group,” “packaging,” or “selection.”
+
+    * Trees represent hierarchical relationships between items. Figure 1.9(a) shows part of the family tree of the Skiena clan. Trees are likely the object in question whenever your problem seeks a “hierarchy,” “dominance relationship,” “ancestor/descendant relationship,” or “taxonomy.”
+
+    * Graphs represent relationships between arbitrary pairs of objects. Figure 1.9(b) models a network of roads as a graph, where the vertices are cities and the edges are roads connecting pairs of cities. Graphs are likely the object in question whenever you seek a “network,” “circuit,” “web,” or “relationship.”
+
+    * Points define locations in some geometric space. For example, the loca- tions of McDonald’s restaurants can be described by points on a map/plane. Points are likely the object in question whenever your problems work on “sites,” “positions,” “data records,” or “locations.”
+
+    * Polygons define regions in some geometric spaces. For example, the bor- ders of a country can be described by a polygon on a map/plane. Polygons and polyhedra are likely the object in question whenever you are working on “shapes,” “regions,” “configurations,” or “boundaries.”
+
+    * Strings represent sequences of characters, or patterns. For example, the names of students in a class can be represented by strings. Strings are likely the object in question whenever you are dealing with “text,” “char- acters,” “patterns,” or “labels.”
+
+* These fundamental structures all have associated algorithm problems, which are presented in the catalog of Part II. Familiarity with these problems is im- portant, because they provide the language we use to model applications. To become fluent in this vocabulary, browse through the catalog and study the in- put and output pictures for each problem. Understanding these problems, even at a cartoon/definition level, will enable you to know where to look later when the problem arises in your application.
