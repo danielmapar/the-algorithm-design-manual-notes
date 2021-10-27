@@ -128,3 +128,14 @@ that are correct and efficient, while being easy to implement.
     * Strings represent sequences of characters, or patterns. For example, the names of students in a class can be represented by strings. Strings are likely the object in question whenever you are dealing with “text,” “char- acters,” “patterns,” or “labels.”
 
 * These fundamental structures all have associated algorithm problems, which are presented in the catalog of Part II. Familiarity with these problems is im- portant, because they provide the language we use to model applications. To become fluent in this vocabulary, browse through the catalog and study the in- put and output pictures for each problem. Understanding these problems, even at a cartoon/definition level, will enable you to know where to look later when the problem arises in your application.
+
+### 1.6 Proof by Contradiction
+
+* Although some computer scientists only know how to prove things by induction, this isn’t true of everyone. The best sometimes use contradiction. The basic scheme of a contradiction argument is as follows:
+    * Assume that the hypothesis (the statement you want to prove) is false.
+    * Develop some logical consequences of this assumption.
+    * Show that one consequence is demonstrably false, thereby showing that the assumption is incorrect and the hypothesis is true.
+
+### 1.10 Exercises
+
+* https://www.algorist.com/algowiki/index.php/Chapter_1
