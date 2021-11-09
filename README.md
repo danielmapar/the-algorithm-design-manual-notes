@@ -198,4 +198,34 @@ that are correct and efficient, while being easy to implement.
 
 * ![dominance](./images/dominance.png)
 
-* Page 53
+### 2.7 Logarithms and Their Applications
+
+* Logarithm is an anagram of  algorithm, but that’s not why we need to know what logarithms are. You’ve seen the button on your calculator, but may have forgotten why it is there. A logarithm is simply an inverse exponential function. Saying bx = y is equivalent to saying that x = logb y. Further, this equivalence is the same as saying blogb y = y.
+
+* Exponential functions grow at a distressingly fast rate, as anyone who has ever tried to pay off a credit card balance understands. Thus, inverse exponential functions (logarithms) grow refreshingly slowly. Logarithms arise in any process where things are repeatedly halved. We’ll now look at several examples.
+
+* ![log_example](./images/log_example.png)
+
+## 2.7.1 Logarithms and Binary Search
+
+* Binary search is a good example of an O(log n) algorithm. To locate a particular person p in a telephone book2 containing n names, you start by comparing p against the middle, or (n/2)nd name, say Monroe, Marilyn. Regardless of whether p belongs before this middle name (Dean, James) or after it (Presley, Elvis), after just one comparison you can discard one half of all the names in the book. The number of steps the algorithm takes equals the number of times we can halve n until only one name is left. By definition, this is exactly log2 n. Thus, twenty comparisons suffice to find any name in the million-name Manhattan phone book!
+
+* Binary search is one of the most powerful ideas in algorithm design. This power becomes apparent if we imagine trying to find a name in an unsorted telephone book.
+
+### 2.7.2 Logarithms and Trees
+
+* A binary tree of height 1 can have up to 2 leaf nodes, while a tree of height 2 can have up to 4 leaves. What is the height h of a rooted binary tree with n leaf nodes? Note that the number of leaves doubles every time we increase the height by 1. To account for n leaves, `n = 2^h`, which implies that `h = log2 n`.
+
+* What if we generalize to trees that have `d` children, where `d = 2` for the case of binary trees? A tree of height `1` can have up to `d` leaf nodes, while one of height `2` can have up to `d^2` leaves. The number of possible leaves multiplies by `d` every time we increase the height by `1`, so to account for `n` leaves, `n = d^h`, which implies that `h = logd n`, as shown in Figure 2.7.
+
+### 2.7.4 Logarithms and Multiplication
+
+* Logarithms were particularly important in the days before pocket calculators. They provided the easiest way to multiply big numbers by hand, either implicitly using a slide rule or explicitly by using a book of logarithms.
+
+* Logarithms are still useful for multiplication, particularly for exponentiation. Recall that `loga(xy) = loga(x)+loga(y)`; that is, the log of a product is the sum of the logs.
+
+### 2.7.5 Fast Exponentiation
+
+* Suppose that we need to exactly compute the value of an for some reasonably large n. Such problems occur in primality testing for cryptography, as dis- cussed in Section 16.8 (page 490). Issues of numerical precision prevent us from applying the formula above.
+
+* The simplest algorithm performs n−1 multiplications, by computing a×a× . . . × a. However, we can do better by observing that n = ⌊n/2⌋ + ⌈n/2⌉. If n is even, then an = (an/2)2. If n is odd, then an = a(a⌊n/2⌋)2. In either case, we have halved the size of our exponent at the cost of, at most, two multiplications, so O(lg n) multiplications suffice to compute the final value.
