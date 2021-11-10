@@ -229,3 +229,7 @@ that are correct and efficient, while being easy to implement.
 * Suppose that we need to exactly compute the value of an for some reasonably large n. Such problems occur in primality testing for cryptography, as dis- cussed in Section 16.8 (page 490). Issues of numerical precision prevent us from applying the formula above.
 
 * The simplest algorithm performs n−1 multiplications, by computing a×a× . . . × a. However, we can do better by observing that n = ⌊n/2⌋ + ⌈n/2⌉. If n is even, then an = (an/2)2. If n is odd, then an = a(a⌊n/2⌋)2. In either case, we have halved the size of our exponent at the cost of, at most, two multiplications, so O(lg n) multiplications suffice to compute the final value.
+
+### 2.10.1 Esoteric Functions
+
+f(n) = √n: The square root is not very esoteric, but represents the class of “sublinear polynomials” since √n = n1/2. Such functions arise in building d-dimensional grids that contain n points. A √n × √n square has area n, and an n1/3 × n1/3 × n1/3 cube has volume n. In general, a d-dimensional hypercube of length n1/d on each side has volume n.
