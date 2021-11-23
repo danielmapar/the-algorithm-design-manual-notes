@@ -233,3 +233,142 @@ that are correct and efficient, while being easy to implement.
 ### 2.10.1 Esoteric Functions
 
 f(n) = √n: The square root is not very esoteric, but represents the class of “sublinear polynomials” since √n = n1/2. Such functions arise in building d-dimensional grids that contain n points. A √n × √n square has area n, and an n1/3 × n1/3 × n1/3 cube has volume n. In general, a d-dimensional hypercube of length n1/d on each side has volume n.
+
+### Notes
+
+* RAM = Random Access Machine
+
+* Best Case = Big Omega
+* Average Case = Big Theta
+* Worst Case = Big O
+
+* Constant Function = BigO(1)
+* Logarithm Function = BigO(log n)
+* Linear Function = BigO(n)
+* Superlinear Function = BigO(n log n)
+* Quadratic Function = BigO(n^2)
+* Cubic Function = BigO(n^3)
+* Exponential Function = BigO(c^n)
+* Factorial Function = BigO(n!)
+
+* A logarithm is simply an inverse exponential function. Saying b^x = y is equivalent to saying that x = logb y. Further, this equivalence is the same as saying b^logb y = y.
+
+* ![three](./images/three.png)
+
+* Exponential functions grow at a distressingly fast rate, as anyone who has ever tried to pay off a credit card balance understands. Thus, inverse exponential functions (logarithms) grow refreshingly slowly. Logarithms arise in any process where things are repeatedly halved. 
+
+* Binary search is a good example of an O(log n) algorithm.
+
+* A binary tree of height 1 can have up to 2 leaf nodes, while a tree of height 2 can have up to 4 leaves.
+
+* Logarithms were particularly important in the days before pocket calculators. They provided the easiest way to multiply big numbers by hand, either implicitly using a slide rule or explicitly by using a book of logarithms.
+
+* Base b = 2: The binary logarithm, usually denoted lg x, is a base 2 logarithm. We have seen how this base arises whenever repeated halving (i.e., binary search) or doubling (i.e., nodes in trees) occurs. Most algorithmic applications of logarithms imply binary logarithms.
+
+* Base b = e: The natural logarithm, usually denoted ln x, is a base e = 2.71828 . . . logarithm. The inverse of ln x is the exponential function exp(x) = ex on your calculator. Thus, composing these functions gives us the identity function,
+
+* Base b = 10: Less common today is the base-10 or common logarithm, usually denoted as log x. This base was employed in slide rules and logarithm books in the days before pocket calculators.
+
+## Chapter 3 - Data structures 
+
+### Notes
+
+* Contiguous vs. Linked Data Structures
+    * Data structures can be neatly classified as either contiguous or linked, depend- ing upon whether they are based on arrays or pointers. Contiguously allocated structures are composed of single slabs of memory, and include arrays, matrices, heaps, and hash tables. Linked data structures are composed of distinct chunks of memory bound together by pointers, and include lists, trees, and graph adjacency lists.
+
+* Arrays
+    * Constant-time access given the index – Because the index of each element maps directly to a particular memory address, we can access arbitrary data items instantly provided we know the index.
+    * Space efficiency – Arrays consist purely of data, so no space is wasted with links or other formatting information. Further, end-of-record information is not needed because arrays are built from fixed-size records.
+    * Memory locality – Many programming tasks require iterating through all the elements of a data structure. Arrays are good for this because they exhibit excellent memory locality. Physical continuity between successive data accesses helps exploit the high-speed cache memory on modern computer architectures.
+
+    * The downside of arrays is that we cannot adjust their size in the middle of a program’s execution. 
+
+        * Actually, we can efficiently enlarge arrays as we need them, through the miracle of dynamic arrays. Suppose we start with an array of size 1, and double its size from m to 2m whenever we run out of space. This doubling process allocates a new contiguous array of size 2m, copies the contents of the old array to the lower half of the new one, and then returns the space used by the old array to the storage allocation system.
+
+* Pointers and Linked Structures
+
+    * Pointers are the connections that hold the pieces of linked structures together. Pointers represent the address of a location in memory. A variable storing a pointer to a given data item can provide more freedom than storing a copy of the item itself. A cell-phone number can be thought of as a pointer to its owner as they move about the planet.
+
+
+* The advantages of linked structures over static arrays include:
+    * Overflow on linked structures never occurs unless the memory is actually full.
+    * Insertion and deletion are simpler than for static arrays.
+    * With large records, moving pointers is easier and faster than moving the items themselves.
+* Conversely, the relative advantages of arrays include:
+    * Space efficiency: linked structures require extra memory for storing pointer fields.
+    * Efficient random access to items in arrays.
+    * Better memory locality and cache performance than random pointer jumping.
+
+* Containers: Stacks and Queues
+
+    * Stacks support retrieval by last-in, first-out (LIFO) order. Stacks are simple to implement and very efficient.
+
+    * Queues support retrieval in first-in, first-out (FIFO) order. This is surely the fairest way to control waiting times for services. Jobs processed in FIFO order minimize the maximum time spent waiting.
+
+* Dictionaries
+    * The dictionary data type permits access to data items by content. You stick an item into a dictionary so you can find it when you need it.
+
+* Actually, there is a way to delete an element from a singly linked list in constant time, as shown in Figure 3.2. Overwrite the node that x points to with the contents of what x.next points to, then deallocate the node that x.next originally pointed to. Special care must be taken if x is the first node in the list, or the last node (by employing a permanent sentinel element that is always the last node in the list). But this would prevent us from having constant-time minimum/maximum operations, because we no longer have time to find new extreme elements after deletion.
+
+    * ![delete_single_list](./images/delete_single_list.png)
+
+* Binary Search Trees
+
+    * A binary search tree labels each node in a binary tree with a single key such that for any node labeled x, all nodes in the left subtree of x have keys < x while all nodes in the right subtree of x have keys > x.4 This search tree labeling scheme is very special. For any binary tree on n nodes, and any set of n keys, there is exactly one labeling that makes it a binary search tree. 
+
+    * ![bst_1](./images/bst_1.png)
+
+    * Traversal in a Tree
+
+        * A prime application of tree traversal is listing the labels of the tree nodes. Binary search trees make it easy to report the labels in sorted order. By definition, all the keys smaller than the root must lie in the left subtree of the root, and all keys bigger than the root in the right subtree. Thus, visiting the nodes recursively, in accord with such a policy, produces an in-order traversal of the search tree:
+
+        * ```cpp
+            void traverse_tre(tree *l) {
+                if (l != NULL) {
+                    traverse_tree(l->left);
+                    process_item(l->item);
+                    traverse_tree(l->right);
+                } 
+            }
+            ```
+    
+    * Different traversal orders come from changing the position of process item relative to the traversals of the left and right subtrees. Processing the item first yields a pre-order traversal, while processing it last gives a post-order traversal. These make relatively little sense with search trees, but prove useful when the rooted tree represents arithmetic or logical expressions.
+
+    * Deletion in a Tree
+
+        * ![bst_2](./images/bst_2.png) 
+
+* How Good are Binary Search Trees?
+
+    * When implemented using binary search trees, all three dictionary operations take O(h) time, where h is the height of the tree. The smallest height we can hope for occurs when the tree is perfectly balanced, meaning that h = ⌈log n⌉. This is very good, but the tree must be perfectly balanced.
+
+* Balanced Search Trees
+
+    * Sophisticated balanced binary search tree data structures have been developed that guarantee the height of the tree always to be O(logn). Therefore, all dictionary operations (insert, delete, query) take O(log n) time each. Implementations of balanced tree data structures such as red–black trees and splay trees are discussed in Section 15.1 (page 440).
+
+* Priority Queues
+
+    * The priority queue is an abstract data type that provides more flexibility than simple sorting, because it allows new elements to enter a system at arbitrary intervals. It can be much more cost-effective to insert a new job into a priority queue than to re-sort everything on each such arrival
+
+* Hashing
+
+    * Hash tables are a very practical way to maintain a dictionary. They exploit the fact that looking an item up in an array takes constant time once you have its index. A hash function is a mathematical function that maps keys to integers. We will use the value of our hash function as an index into an array, and store our item at that position.
+
+    * This creates unique identifier numbers, but they are so large they will quickly exceed the number of desired slots in our hash table (denoted by m). We must reduce this number to an integer between 0 and m − 1, by taking the remainder H′(S) = H(S) mod m.
+
+    * Collision Resolution
+
+        * Chaining represents a hash table as an array of m linked lists (“buckets”)
+
+        * Open addressing maintains the hash table as a simple array of elements (not buckets). Each cell is initialized to null.The simplest possibility (called sequential probing) inserts the item into the next open cell in the table.
+
+* Duplicate Detection via Hashing
+    * However, we can hash D to an integer, and compare H(D) to the hash codes of the rest of the corpus. Only if there is a collision might D be a possible duplicate. Since we expect few spurious collisions, we can explicitly compare the few doc- uments sharing a particular hash code with little total effort.
+
+    * However, we could build a hash table of all overlapping windows (sub- strings) of length w in all the documents in the corpus. Whenever there is a match of hash codes, there is likely a common substring of length w between the two documents, which can then be further investigated. We should choose w to be long enough so such a co-occurrence is very unlikely to happen by chance.
+
+* Specialized Data Structures
+
+    * Graph data structures – Graphs are typically represented using either adjacency matrices or adjacency lists. 
+
+    * String data structures – Character strings are typically represented by arrays of characters, perhaps with a special character to mark the end of the string. Suffix trees/arrays are special data structures that preprocess strings to make pattern matching operations faster.
