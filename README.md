@@ -363,6 +363,7 @@ f(n) = √n: The square root is not very esoteric, but represents the class of �
         * Open addressing maintains the hash table as a simple array of elements (not buckets). Each cell is initialized to null.The simplest possibility (called sequential probing) inserts the item into the next open cell in the table.
 
 * Duplicate Detection via Hashing
+
     * However, we can hash D to an integer, and compare H(D) to the hash codes of the rest of the corpus. Only if there is a collision might D be a possible duplicate. Since we expect few spurious collisions, we can explicitly compare the few doc- uments sharing a particular hash code with little total effort.
 
     * However, we could build a hash table of all overlapping windows (sub- strings) of length w in all the documents in the corpus. Whenever there is a match of hash codes, there is likely a common substring of length w between the two documents, which can then be further investigated. We should choose w to be long enough so such a co-occurrence is very unlikely to happen by chance.
@@ -372,3 +373,23 @@ f(n) = √n: The square root is not very esoteric, but represents the class of �
     * Graph data structures – Graphs are typically represented using either adjacency matrices or adjacency lists. 
 
     * String data structures – Character strings are typically represented by arrays of characters, perhaps with a special character to mark the end of the string. Suffix trees/arrays are special data structures that preprocess strings to make pattern matching operations faster.
+
+## Chapter 4 - Sorting
+
+### Notes
+
+* Priority Queue 
+
+    * Heaps are concrete data structures, whereas **priority queues are abstract data structures**. An abstract data structure determines the interface, while a concrete data structure defines the implementation. Heaps are commonly used to implement priority queues.
+
+    * The heap implementation of the priority queue guarantees that both pushing (adding) and popping (removing) elements are logarithmic time operations. This means that the time it takes to do push and pop is proportional to the base-2 logarithm of the number of elements.
+
+    * A heap implements a priority queue as a complete binary tree. In a binary tree, each node will have at most two children. **In a complete binary tree, all levels except possibly the deepest one are full at all times**. If the deepest level is incomplete, then it will have the nodes as far to the left as possible.
+
+    * The completeness property means that the depth of the tree is the base-2 logarithm of the number of elements, rounded up. Here’s an example of a complete binary tree:
+
+    * ![heap](./images/heap.png) 
+
+    * In this particular example, all levels are complete. Each node except for the deepest ones has exactly two children. There are a total of seven nodes in three levels. Three is the base-2 logarithm of seven, rounded up.
+
+    * In a **heap tree, the value in a node is always smaller than both of its children**. This is called the heap property. This is different from a binary search tree, in which only the left node will be smaller than the value of its parent.
