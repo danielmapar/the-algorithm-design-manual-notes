@@ -193,10 +193,25 @@ that are correct and efficient, while being easy to implement.
 * **Cubic functions**, f(n) = n3: Such functions enumerate all triples of items in an n-element universe. These also arise in certain dynamic programming algorithms, to be developed in Chapter 10.
 
 * **Exponential functions**, f(n) = cn for a given constant c > 1: Functions like 2n arise when enumerating all subsets of n items. As we have seen, exponential algorithms become useless fast, but not as fast as. . .
+    * `n^r` works for permutation with repetition.
+    * `10^3 = 10 × 10 × ... (3 times) = 103 = 1,000` permutations
+    * Where `n` is the number of things to choose from, and we choose `r` of them, repetition is allowed, and order matters.
+    * For permutation ORDER MATTERS. This means `01` != `10`, both need to be accounted.
+
 
 * **Factorial functions**, f(n) = n!: Functions like n! arise when generating all permutations or orderings of n items.
+    * `n!` works for permutation without repetition. 
+    * In this case, we have to reduce the number of available choices each time.
+    * After choosing, say, number "14" we can't choose it again.
+    * `16 × 15 × 14 × 13 × ... = 20,922,789,888,000`
+    * For permutation ORDER MATTERS. This means `01` != `10`, both need to be accounted.
+    * ![permutation_without_repetition](./images/permutation_without_repetition.png)
+    * ![permutation_without_repetition_1](./images/permutation_without_repetition_1.png)
 
-* ![dominance](./images/dominance.png)
+* More about permutation and combination [here](https://www.mathsisfun.com/combinatorics/combinations-permutations.html)
+
+* Dominance line   
+    * ![dominance](./images/dominance.png)
 
 ### 2.7 Logarithms and Their Applications
 
