@@ -393,6 +393,20 @@ f(n) = âˆšn: The square root is not very esoteric, but represents the class of â
 
 ### Notes
 
+* Binary Search
+    * Given a set of n items, which elements occurs the largest number of times in the set? If the items are sorted, we can sweep from left to right and count the number of occurrences of each element, since all identical items will be lumped together after sorting.
+
+    * To find out how often an arbitrary element k occurs, look up k using binary search in a sorted array of keys. By walking to the left of this point until the first element is not k and then doing the same to the right, we can fin this count in `O(log n + c)` time, where `c` is the number of occurrences of `k`.
+
+* Heap Sort
+
+    * Heaps are a simple and elegant data structure for efficiently supporting the priority queue operations insert and extract-min. Heaps work by maintaining a partial order on the set of elements that is weaker than the sorted order (so it can be efficient to maintain) yet strong than random order (so the minimum element can be quickly identified).
+
+    * In this spirit, a heap-labeled tree is defined to be a binary tree such that the key of each node dominates they keys of its children. 
+
+    * With heaps all but the last level are filled, so the height h of an n elements heap is logarithmic. That implies that `h = lg n`
+
+
 * Priority Queue 
 
     * Heaps are concrete data structures, whereas **priority queues are abstract data structures**. An abstract data structure determines the interface, while a concrete data structure defines the implementation. Heaps are commonly used to implement priority queues.
@@ -408,3 +422,22 @@ f(n) = âˆšn: The square root is not very esoteric, but represents the class of â
     * In this particular example, all levels are complete. Each node except for the deepest ones has exactly two children. There are a total of seven nodes in three levels. Three is the base-2 logarithm of seven, rounded up.
 
     * In a **heap tree, the value in a node is always smaller than both of its children**. This is called the heap property. This is different from a binary search tree, in which only the left node will be smaller than the value of its parent.
+
+* Merge Sort
+
+    * Recursive algorithms reduce large problems into small ones. Merge sort is a classic divide-and-conquer algorithm. 
+
+    * Merge sort is a great algorithm for sorting linked lists, because it does not rely on random access to elements like heapsort or quicksort.
+
+    * Like QuickSort, Merge Sort is a Divide and Conquer algorithm. It divides the input array into two halves, calls itself for the two halves, and then merges the two sorted halves. The merge() function is used for merging two halves. The merge(arr, l, m, r) is a key process that assumes that arr[l..m] and arr[m+1..r] are sorted and merges the two sorted sub-arrays into one. 
+
+    * ![merge_sort](./images/merge_sort.png)
+
+* Quick Sort
+
+    * The advantage of quicksort is that it can be done in-place (like heapsort). Merge sort requires extra memory to operate (the `merge` step)
+
+    * The difficulty is the height of the tree depends upon where the pivot element ends up in each partition. This could lead to `O(n^2)` if we use the last element as the pivot of a sorted array like: `[1,2,3,4,5]`. 
+
+    * A well implemented quick sort can be 2 to 3 times faster compared to merge sort and heap sort. However, this mostly holds for sorting in memory. In case you want to sort data that is too big to fit in memory, merge sort is the winner.
+
