@@ -112,7 +112,6 @@ void Queue<T>::print() {
 }
 
 int main() {
-
     std::shared_ptr<Queue<int> > queue = std::make_shared<Queue<int> >(); 
     for (int num : std::vector<int>{1,2,3}) queue->enqueue(num);
     {

@@ -36,6 +36,8 @@ int Vector<T>::getSize() {
     return this->size;
 }
 
+// O(n) runtime complexity
+// O(n*2) space complexity
 template <class T>
 void Vector<T>::resize() {
     T *prevBuffer = this->buffer.get();
@@ -43,26 +45,34 @@ void Vector<T>::resize() {
     T *nextBuffer = new T[this->capacity];
     for (int i = 0; i < this->size; i++) nextBuffer[i] = prevBuffer[i];
     this->buffer = std::unique_ptr<T[]>(nextBuffer);
-    std::cout << "Resized vector to capacity: " << this->capacity << std::endl;
+    std::cout << "Resized vector capacity to: " << this->capacity << std::endl;
 }
 
+// O(1) runtime complexity
+// O(1) space complexity
 template <class T>
 T Vector<T>::at(const int &index) {
     if (index < this->size) return this->buffer[index];
     else throw std::invalid_argument("Index " + std::to_string(index) + " is out of bound!");
 }
 
+// O(1) runtime complexity
+// O(1) space complexity
 template <class T>
 T Vector<T>::operator[](const int &index) {
     return this->at(index);
 }
 
+// O(1) runtime complexity
+// O(1) space complexity
 template <class T>
 void Vector<T>::pushBack(T item) {
     if (this->size == this->capacity) this->resize();
     this->buffer[this->size++] = item;
 }
 
+// O(1) runtime complexity
+// O(1) space complexity
 template <class T>
 T Vector<T>::popBack() {
     T item;
@@ -75,6 +85,8 @@ T Vector<T>::popBack() {
     return item;
 }
 
+// O(n) runtime complexity
+// O(1) space complexity
 template <class T>
 void Vector<T>::print() {
     std::cout << "Printing vector: " << std::endl;

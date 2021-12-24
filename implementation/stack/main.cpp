@@ -62,6 +62,8 @@ Stack<T>::Stack() {
     this->bottom = NULL;
 }
 
+// O(1) runtime complexity
+// O(1) space complexity
 template <class T>
 std::shared_ptr<Node<T> > Stack<T>::push(T value) {
     std::shared_ptr<Node<T> > node = std::make_shared<Node<T> >(value);
@@ -75,6 +77,8 @@ std::shared_ptr<Node<T> > Stack<T>::push(T value) {
     return this->top;
 }
 
+// O(1) runtime complexity
+// O(1) space complexity
 template <class T>
 std::shared_ptr<Node<T> > Stack<T>::pop() {
     std::shared_ptr<Node<T> > node = this->top->getNextNode();
@@ -86,11 +90,15 @@ std::shared_ptr<Node<T> > Stack<T>::pop() {
     return NULL;
 }
 
+// O(1) runtime complexity
+// O(1) space complexity
 template <class T>
 std::shared_ptr<Node<T> > Stack<T>::peek() {
     return this->top;
 }
 
+// O(n) runtime complexity
+// O(1) space complexity
 template <class T>
 void Stack<T>::print() {
     std::shared_ptr<Node<T> > node = this->top;
@@ -102,7 +110,6 @@ void Stack<T>::print() {
 }
 
 int main() {
-
     std::shared_ptr<Stack<int> > stack = std::make_shared<Stack<int> >();
     
     for (int item : std::vector<int>{1,2,3,4,5,6}) {
