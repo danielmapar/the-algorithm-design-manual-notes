@@ -375,11 +375,13 @@ f(n) = √n: The square root is not very esoteric, but represents the class of �
 
         * Chaining represents a hash table as an array of m linked lists (“buckets”)
 
-        * Open addressing maintains the hash table as a simple array of elements (not buckets). Each cell is initialized to null.The simplest possibility (called sequential probing) inserts the item into the next open cell in the table.
+        * Open addressing maintains the hash table as a simple array of elements (not buckets). Each cell is initialized to null. The simplest possibility (called sequential probing) inserts the item into the next open cell in the table. Deletion is a bit trickier and will need the help of a concept called tombstones.
+
+        * http://web.stanford.edu/class/archive/cs/cs166/cs166.1166/lectures/12/Small12.pdf
 
 * Duplicate Detection via Hashing
 
-    * However, we can hash D to an integer, and compare H(D) to the hash codes of the rest of the corpus. Only if there is a collision might D be a possible duplicate. Since we expect few spurious collisions, we can explicitly compare the few doc- uments sharing a particular hash code with little total effort.
+    * However, we can hash D to an integer, and compare H(D) to the hash codes of the rest of the corpus. Only if there is a collision might D be a possible duplicate. Since we expect few spurious collisions, we can explicitly compare the few documents sharing a particular hash code with little total effort.
 
     * However, we could build a hash table of all overlapping windows (sub- strings) of length w in all the documents in the corpus. Whenever there is a match of hash codes, there is likely a common substring of length w between the two documents, which can then be further investigated. We should choose w to be long enough so such a co-occurrence is very unlikely to happen by chance.
 

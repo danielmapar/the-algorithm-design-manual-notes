@@ -3,6 +3,9 @@
 #include <vector>
 #include <list>
 
+// Read more here:
+// http://web.stanford.edu/class/archive/cs/cs166/cs166.1166/lectures/12/Small12.pdf
+
 template <class K, class V>
 class HashTable {
     public:
@@ -13,6 +16,7 @@ class HashTable {
         static int convertStringToInt(std::string str);
         void print();
     private:
+        // Instead of a Vector of List, we could also use a Vector of BST
         std::unique_ptr<std::vector<std::list<std::pair<K, V>>>> buckets;
         std::function<int(K, int&)> hashFunction;
         int numOfBuckets;
@@ -22,11 +26,12 @@ template <class K, class V>
 HashTable<K,V>::HashTable(int numOfBuckets, const std::function<int(K, int&)> &hashFunction) {
     this->numOfBuckets = numOfBuckets;
     this->buckets = std::make_unique<std::vector<std::list<std::pair<K,V>>>>(numOfBuckets);
-    if (this->hashFunction == nullptr) {
-        this->hashFunction = [&](K key, int &numOfBuckets) -> int {
-            return this->convertStringToInt(key) % numOfBuckets;
-        };
-    }
+    this->hashFunction = hashFunction != nullptr ? 
+            hashFunction 
+            : 
+            this->hashFunction = [&](K key, int &numOfBuckets) -> int {
+                return this->convertStringToInt(key) % numOfBuckets;
+            };
 }
 
 // O(n) runtime complexity (n = string length)
@@ -38,14 +43,24 @@ int HashTable<K,V>::convertStringToInt(std::string str) {
     return value;
 }
 
-// O(1) runtime complexity
+// O(m) runtime complexity -> m = size of collision list inside a bucket
 // O(1) space complexity
 template <class K, class V>
 void HashTable<K,V>::insert(K key, V value) {
-    this->buckets->at(this->hashFunction(key, this->numOfBuckets)).push_back(std::pair<K,V>(key, value));
+    int hashKey = this->hashFunction(key, this->numOfBuckets);
+    if (!this->buckets->at(hashKey).empty()){
+        for (std::pair<K,V> &pair: this->buckets->at(hashKey)) {
+            if (pair.first == key) {
+                pair.second = value;
+                break;
+            }
+        }
+        return;
+    }
+    this->buckets->at(hashKey).push_back(std::pair<K,V>(key, value));
 }
 
-// O(1) runtime complexity
+// O(m) runtime complexity -> m = size of collision list inside a bucket
 // O(1) space complexity
 template <class K, class V>
 void HashTable<K,V>::remove(K key) {
@@ -60,7 +75,7 @@ void HashTable<K,V>::remove(K key) {
     list.remove(pairToRemove);
 }
 
-// O(1) runtime complexity
+// O(m) runtime complexity -> m = size of collision list inside a bucket
 // O(1) space complexity
 template <class K, class V>
 std::pair<K, V> HashTable<K,V>::get(K key) {
@@ -70,7 +85,7 @@ std::pair<K, V> HashTable<K,V>::get(K key) {
     return std::pair<K, V>();
 }
 
-// O(n) runtime complexity
+// O(n) runtime complexity -> n = all elements inside hashtable (including collision lists)
 // O(1) space complexity
 template <class K, class V>
 void HashTable<K,V>::print() {
@@ -86,6 +101,7 @@ int main() {
     };
     std::unique_ptr<HashTable<std::string, std::string>> hashTable = std::make_unique<HashTable<std::string, std::string>>(100);
     hashTable->insert("firstName", "Daniel");
+    hashTable->insert("lastName", "Parreira");
     hashTable->insert("lastName", "Parreira");
     hashTable->insert("age", "10");
     hashTable->print();
