@@ -65,7 +65,7 @@ void HashTable<K,V>::remove(K key) {
     for (auto it = this->buffer->begin() + hashKey; it != this->buffer->end(); ++it) {
         std::pair<K,V> &pair = *it;
         if (pair.first == key) {
-            // Create a thumbstone
+            // Create a tombstone
             pair.first = "";
             pair.second = "";
             break;
