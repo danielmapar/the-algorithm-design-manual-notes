@@ -64,7 +64,9 @@
         "utility": "cpp",
         "iostream": "cpp",
         "list": "cpp",
-        "__functional_03": "cpp"
+        "__functional_03": "cpp",
+        "stack": "cpp",
+        "deque": "cpp"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }
