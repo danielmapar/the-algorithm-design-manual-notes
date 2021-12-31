@@ -8,17 +8,14 @@ class Node {
     public:
         Node(T value);
         T getValue();
-        void setParent(std::shared_ptr<Node<T>> node);
-        void setLeft(T value, std::shared_ptr<Node<T>> parent);
-        void setRight(T value, std::shared_ptr<Node<T>> parent);
-        void setLeft(std::shared_ptr<Node<T>> node, std::shared_ptr<Node<T>> parent);
-        void setRight(std::shared_ptr<Node<T>> node, std::shared_ptr<Node<T>> parent);
-        std::shared_ptr<Node<T>> getParent();
+        void setLeft(T value);
+        void setRight(T value);
+        void setLeft(std::shared_ptr<Node<T>> node);
+        void setRight(std::shared_ptr<Node<T>> node);
         std::shared_ptr<Node<T>> getLeft();
         std::shared_ptr<Node<T>> getRight();
     private:
         T value;
-        std::shared_ptr<Node<T>> parent;
         std::shared_ptr<Node<T>> left;
         std::shared_ptr<Node<T>> right;
 };
@@ -28,7 +25,6 @@ Node<T>::Node(T value) {
     this->value = value;
     this->left = nullptr;
     this->right = nullptr;
-    this->parent = nullptr;
 }
 
 template <typename T>
@@ -37,37 +33,23 @@ T Node<T>::getValue() {
 }
 
 template <typename T>
-void Node<T>::setParent(std::shared_ptr<Node<T>> node) {
-    this->parent = node;
-}
-
-template <typename T>
-void Node<T>::setLeft(T value, std::shared_ptr<Node<T>> parent) {
+void Node<T>::setLeft(T value) {
     this->left = std::make_shared<Node<T>>(value);
-    this->left->setParent(parent);
 }
 
 template <typename T>
-void Node<T>::setLeft(std::shared_ptr<Node<T>> node, std::shared_ptr<Node<T>> parent) {
+void Node<T>::setLeft(std::shared_ptr<Node<T>> node) {
     this->left = node;
-    this->left->setParent(parent);
 }
 
 template <typename T>
-void Node<T>::setRight(T value, std::shared_ptr<Node<T>> parent) {
+void Node<T>::setRight(T value) {
     this->right = std::make_shared<Node<T>>(value);
-    this->right->setParent(parent);
 }
 
 template <typename T>
-void Node<T>::setRight(std::shared_ptr<Node<T>> node, std::shared_ptr<Node<T>> parent) {
+void Node<T>::setRight(std::shared_ptr<Node<T>> node) {
     this->right = node;
-    this->right->setParent(parent);
-}
-
-template <typename T>
-std::shared_ptr<Node<T>> Node<T>::getParent() {
-    return this->parent;
 }
 
 template <typename T>
@@ -85,7 +67,7 @@ class BST {
     public:
         BST();
         void insert(T value);
-        std::shared_ptr<Node<T>> get(T value);
+        std::pair<std::shared_ptr<Node<T>>,std::shared_ptr<Node<T>>> get(T value);
         std::shared_ptr<Node<T>> remove(T value);
         std::vector<Node<T>> inOrder();
     private:
@@ -107,13 +89,13 @@ void BST<T>::insert(T value) {
     while(node != nullptr) {
         if (value >= node->getValue()) {
             if (node->getRight() == nullptr) {
-                node->setRight(value, node);
+                node->setRight(value);
                 break;
             }
             node = node->getRight();
         } else {
             if (node->getLeft() == nullptr) {
-                node->setLeft(value, node);
+                node->setLeft(value);
                 break;
             }
             node = node->getLeft();
@@ -122,24 +104,42 @@ void BST<T>::insert(T value) {
 }
 
 template <typename T>
-std::shared_ptr<Node<T>> BST<T>::get(T value) {
-    if (this->head == nullptr) return nullptr;
+std::pair<std::shared_ptr<Node<T>>,std::shared_ptr<Node<T>>> BST<T>::get(T value) {
+    if (this->head == nullptr) return std::pair<std::shared_ptr<Node<T>>,std::shared_ptr<Node<T>>>(nullptr, nullptr);
 
     std::shared_ptr<Node<T>> node = this->head;
+    std::shared_ptr<Node<T>> parent = nullptr;
     while(node != nullptr) {
-        if (node->getValue() == value) return node;
+        if (node->getValue() == value) return std::pair<std::shared_ptr<Node<T>>,std::shared_ptr<Node<T>>>(parent, node);
+        parent = node;
         if (value > node->getValue()) node = node->getRight();
         else node = node->getLeft();
     }
-    return nullptr;
+    return std::pair<std::shared_ptr<Node<T>>,std::shared_ptr<Node<T>>>(nullptr, nullptr);
 }
 
 template <typename T>
 std::shared_ptr<Node<T>> BST<T>::remove(T value) {
-    std::shared_ptr<Node<T>> nodeToRemove = this->get(value);
-    if (nodeToRemove == nullptr) return nullptr;
+    std::pair<std::shared_ptr<Node<T>>,std::shared_ptr<Node<T>>> nodePair = this->get(value);
+    std::shared_ptr<Node<T>> nodeToRemove = nullptr;
+    std::shared_ptr<Node<T>> parentOfNodeToRemove = nullptr;
+    if (nodePair.second == nullptr) return nullptr;
+    nodeToRemove = nodePair.second;
+    if (nodePair.first != nullptr) parentOfNodeToRemove= nodePair.first;
 
-    // TODO
+    if (nodeToRemove->getLeft() != nullptr) {
+        // Check right till it does not exist 
+        std::shared_ptr<Node<T>> nodeToReplace = nodeToRemove->getLeft();
+        while (nodeToReplace != nullptr) {
+            if (nodeToReplace->getRight() != nullptr) nodeToReplace = nodeToReplace->getRight();
+        } 
+
+    } else if (nodeToRemove->getRight() != nullptr) {
+        // Check left till it does not exist 
+    } else {
+        if (parentOfNodeToRemove->getLeft() == nodeToRemove) parentOfNodeToRemove->setLeft(nullptr);
+        else parentOfNodeToRemove->setRight(nullptr);
+    }
 
     return nodeToRemove;
 }
@@ -167,7 +167,7 @@ std::vector<Node<T>> BST<T>::inOrder() {
     }
 
     for (Node<T> node : output) 
-        std::cout << "Node val: " << node.getValue() << ", parent: " << (node.getParent() != nullptr ? node.getParent()->getValue() : -1) << std::endl;
+        std::cout << "Node val: " << node.getValue() << std::endl;
     std::cout << "---------" << std::endl;
     
     return output;
@@ -193,30 +193,77 @@ int main (){
 
     bst->inOrder();
     
-    if (bst->get(5) != nullptr) 
-        std::cout << "Get number: " << bst->get(5)->getValue() << std::endl;
+    if (bst->get(5).second != nullptr) 
+        std::cout << "Get node: " << bst->get(5).second->getValue() << ", with parent: " << bst->get(5).first->getValue() << std::endl;
     else 
         std::cout << "Node not found!" << std::endl;
 
-    bst->remove(5);
-    /* Example tree:
+    bst->remove(6);
+    /* 
+    Example tree:
            3
           / \
          2   6
         /   / 
        1   4   
+
+    Example tree:
+           2
+          / 
+         1   
+
+    Example tree:
+           3
+            \
+             6
+
+    Example tree:
+           3
+
+    Example tree:
+           6
+          /  \
+         2    7
+        / \    
+       1   3   
+            \
+             5
+            /
+           4
+
+    Example tree:
+           1
+          / \
+         0   8
+            / 
+           4 
+          / \
+         3   7
+            / 
+           5   
+
+    Example tree:
+           7
+          / 
+         4
+        / \  
+       1   6
+          / 
+         5
+          
+          
     */
 
-    bst->inOrder();
+    // bst->inOrder();
 
-    bst->remove(3);
+    // bst->remove(3);
 
     /* Example tree:
-           6
+           2
           / \
-         2   4
-        /    
-       1    
+         1   6
+            / 
+           4   
     */
 
     bst->inOrder();
