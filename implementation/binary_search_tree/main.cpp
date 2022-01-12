@@ -2,11 +2,14 @@
 #include <memory>
 #include <vector>
 #include <stack>
+#include <queue>
+#include <string>
 
 template <typename T>
 class Node {
     public:
         Node(T value);
+        Node();
         T getValue();
         void setLeft(T value);
         void setRight(T value);
@@ -15,10 +18,17 @@ class Node {
         std::shared_ptr<Node<T>> getLeft();
         std::shared_ptr<Node<T>> getRight();
     private:
+        bool initialized;
         T value;
         std::shared_ptr<Node<T>> left;
         std::shared_ptr<Node<T>> right;
 };
+
+template <typename T>
+Node<T>::Node() {
+    this->left = nullptr;
+    this->right = nullptr;
+}
 
 template <typename T>
 Node<T>::Node(T value) {
@@ -70,6 +80,7 @@ class BST {
         std::pair<std::shared_ptr<Node<T>>,std::shared_ptr<Node<T>>> get(T value);
         std::shared_ptr<Node<T>> remove(T value);
         std::vector<Node<T>> inOrder();
+        void draw();
     private:
         std::shared_ptr<Node<T>> head;
 };
@@ -173,6 +184,56 @@ std::vector<Node<T>> BST<T>::inOrder() {
     return output;
 }
 
+template <typename T>
+void BST<T>::draw() {
+    int lineSize = 70;
+    int emptySpaceSize = 1;
+    bool lineIsEmpty = true;
+    std::queue<std::shared_ptr<Node<T>>> queue;
+    std::queue<std::shared_ptr<Node<T>>> nextLevelQueue;
+    queue.emplace(this->head);
+
+    lineSize /= 2;
+    std::cout << std::string(lineSize, ' ') << this->head->getValue() << std::endl;
+
+    lineSize /= 2;
+    while(!queue.empty()) {
+        std::shared_ptr<Node<T>> element = queue.front();
+        queue.pop();
+        
+        std::cout << std::string(lineSize, ' ');
+        if (element->getLeft() != nullptr) {
+            lineIsEmpty = false;
+            nextLevelQueue.emplace(element->getLeft());
+            std::cout << element->getLeft()->getValue();
+        } else {
+            nextLevelQueue.emplace(std::make_shared<Node<T>>());
+            std::cout << std::string(emptySpaceSize, ' ');
+        }
+        std::cout << std::string(lineSize, ' ');
+
+        std::cout << std::string(lineSize, ' ');
+        if (element->getRight() != nullptr) {
+            lineIsEmpty = false;
+            nextLevelQueue.emplace(element->getRight());
+            std::cout << element->getRight()->getValue();
+        } else {
+            nextLevelQueue.emplace(std::make_shared<Node<T>>());
+            std::cout << std::string(emptySpaceSize, ' ');
+        }
+        std::cout << std::string(lineSize, ' ');
+
+        if (queue.empty()) {
+            if (lineIsEmpty) return;
+            lineIsEmpty = true;
+            std::cout << std::endl;
+            lineSize /= 2;
+            queue = nextLevelQueue;
+            nextLevelQueue = std::queue<std::shared_ptr<Node<T>>>();
+        }
+    }
+}
+
 
 int main (){
     std::unique_ptr<BST<int>> bst = std::make_unique<BST<int>>();
@@ -182,13 +243,26 @@ int main (){
     bst->insert(5);
     bst->insert(4);
     bst->insert(6);
+    bst->insert(2);
+    bst->insert(7);
+    bst->insert(0);
+    bst->insert(8);
+    bst->insert(9);
+    bst->insert(5);
 
     /* Example tree:
-           3
-          / \
-         2   5
-        /   / \
-       1   4   6
+            3
+          /    \
+         2      5
+        / \    / \
+       1   2  4   6
+      /          /  \
+     0          5    7
+                      \
+                       8
+                        \
+                         9
+        
     */
 
     bst->inOrder();
@@ -198,74 +272,9 @@ int main (){
     else 
         std::cout << "Node not found!" << std::endl;
 
-    bst->remove(6);
-    /* 
-    Example tree:
-           3
-          / \
-         2   6
-        /   / 
-       1   4   
-
-    Example tree:
-           2
-          / 
-         1   
-
-    Example tree:
-           3
-            \
-             6
-
-    Example tree:
-           3
-
-    Example tree:
-           6
-          /  \
-         2    7
-        / \    
-       1   3   
-            \
-             5
-            /
-           4
-
-    Example tree:
-           1
-          / \
-         0   8
-            / 
-           4 
-          / \
-         3   7
-            / 
-           5   
-
-    Example tree:
-           7
-          / 
-         4
-        / \  
-       1   6
-          / 
-         5
-          
-          
-    */
-
-    // bst->inOrder();
-
-    // bst->remove(3);
-
-    /* Example tree:
-           2
-          / \
-         1   6
-            / 
-           4   
-    */
-
+    //bst->remove(6);
     bst->inOrder();
+
+    bst->draw();
     return 0;
 }
