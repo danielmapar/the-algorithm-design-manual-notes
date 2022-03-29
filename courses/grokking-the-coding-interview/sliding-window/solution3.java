@@ -11,7 +11,7 @@ class SmallestSubArrayWithAGreaterSum {
             windowStart++; // slide the window ahead
           }
         }
-    
+
         return minLength == Integer.MAX_VALUE ? 0 : minLength;
       }
     public static int getSmallestSubArraySize(int[] arr, int S) {
@@ -23,11 +23,11 @@ class SmallestSubArrayWithAGreaterSum {
             else if ((sum + arr[i]) < S) sum += arr[i];
             else {
                 sum += arr[i];
-                max = Math.min(i - firstIndex + 1, max);
-                sum -= arr[firstIndex];
-                firstIndex++;
-                if (sum >= S) 
-                    max = Math.min(i - firstIndex + 1, max);
+                while (sum >= S) {
+                  max = Math.min(i - firstIndex + 1, max);
+                  sum -= arr[firstIndex];
+                  firstIndex++;
+                }
             }
         }
 
@@ -37,6 +37,10 @@ class SmallestSubArrayWithAGreaterSum {
         System.out.println(getSmallestSubArraySize(new int[] {2, 1, 5, 2, 3, 2}, 7));
         System.out.println(getSmallestSubArraySize(new int[] {2, 1, 5, 2, 8}, 7));
         System.out.println(getSmallestSubArraySize(new int[] {3, 4, 1, 1, 6}, 8));
+        System.out.println("-------");
+        System.out.println(findMinSubArray(new int[] {2, 1, 5, 2, 3, 2}, 7));
+        System.out.println(findMinSubArray(new int[] {2, 1, 5, 2, 8}, 7));
+        System.out.println(findMinSubArray(new int[] {3, 4, 1, 1, 6}, 8));
 
         System.out.println(getSmallestSubArraySize(new int[] {3, 4, 11, 1, 36, 12, 3, 4, 5, 1, 123, 23, 1}, 8) == findMinSubArray(new int[] {3, 4, 11, 1, 36, 12, 3, 4, 5, 1, 123, 23, 1}, 8));
     }
