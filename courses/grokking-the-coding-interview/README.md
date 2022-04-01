@@ -8,75 +8,80 @@
 
 * Given an array, find the average of all subarrays of `K` contiguous elements in it.
 
-* `Input: [1, 3, 2, 6, -1, 4, 1, 8, 2], K=5`
+* Examples
+    * ```
+        Input: [1, 3, 2, 6, -1, 4, 1, 8, 2], K=5
+        Output: [2.2, 2.8, 2.4, 3.6, 2.8]
+        ```
 
-* `Output: [2.2, 2.8, 2.4, 3.6, 2.8]`
+* Code
+    * ```java
+        import java.util.Arrays;
 
-* ```java
-    import java.util.Arrays;
+        class AverageOfSubarrayOfSizeK {
+            public static double[] findAverages(int K, int[] arr) {
+                double[] result = new double[arr.length - K + 1];
+                for (int i = 0; i <= arr.length - K; i++) {
+                    // find sum of next 'K' elements
+                    double sum = 0;
+                    for (int j = i; j < i + K; j++)
+                        sum += arr[j];
+                    result[i] = sum / K; // calculate average
+                }
 
-    class AverageOfSubarrayOfSizeK {
-        public static double[] findAverages(int K, int[] arr) {
-            double[] result = new double[arr.length - K + 1];
-            for (int i = 0; i <= arr.length - K; i++) {
-                // find sum of next 'K' elements
-                double sum = 0;
-                for (int j = i; j < i + K; j++)
-                    sum += arr[j];
-                result[i] = sum / K; // calculate average
+                return result;
             }
 
-            return result;
+            public static void main(String[] args) {
+                double[] result = AverageOfSubarrayOfSizeK.findAverages(5, 
+                                    new int[] { 1, 3, 2, 6, -1, 4, 1, 8, 2 });
+                System.out.println("Averages of subarrays of size K: " + Arrays.toString(result));
+            }
         }
+        ```
 
-        public static void main(String[] args) {
-            double[] result = AverageOfSubarrayOfSizeK.findAverages(5, 
-                                new int[] { 1, 3, 2, 6, -1, 4, 1, 8, 2 });
-            System.out.println("Averages of subarrays of size K: " + Arrays.toString(result));
+* Solution
+    * Time complexity: Since for every element of the input array, we are calculating the sum of its next `K` elements, the time complexity of the above algorithm will be `O(N*K)` where `N` is the number of elements in the input array.
+
+    * The inefficiency is that for any two consecutive subarrays of size ‘5’, the overlapping part (which will contain four elements) will be evaluated twice. For example, take the above-mentioned input:
+
+    * ![sliding_window](./images/sliding_window.png)
+
+    * As you can see, there are four overlapping elements between the subarray (indexed from `0-4`) and the subarray (indexed from `1-5`). Can we somehow reuse the sum we have calculated for the overlapping elements?
+
+    * The efficient way to solve this problem would be to visualize each subarray as a sliding window of `5` elements. This means that we will slide the window by one element when we move on to the next subarray. To reuse the sum from the previous subarray, we will subtract the element going out of the window and add the element now being included in the sliding window. This will save us from going through the whole subarray to find the sum and, as a result, the algorithm complexity will reduce to `O(N)`.
+
+    * ![sliding_window2](./images/sliding_window2.png)
+
+* Code
+    * ```java
+        public static double[] findAveragesV2(int K, int[] arr) {
+            double[] results = new double[arr.length - K + 1];
+
+            int sum = 0;
+            // O(K)
+            for (int i = 0; i < K; i++) {
+                sum += arr[i];
+            }
+            int i = 0;
+            results[i] = sum/K;
+
+            int firstIndex = 0;
+            int lastIndex = K-1;
+
+            // O(N-K)
+            while (true) {
+                sum -= arr[firstIndex];
+                firstIndex++;
+                lastIndex++;
+                if (lastIndex == arr.length) break;
+                sum += arr[lastIndex];
+                results[++i] = sum/K;
+            }
+            
+            return results;
         }
-    }
-    ```
-
-* Time complexity: Since for every element of the input array, we are calculating the sum of its next `K` elements, the time complexity of the above algorithm will be `O(N*K)` where `N` is the number of elements in the input array.
-
-* The inefficiency is that for any two consecutive subarrays of size ‘5’, the overlapping part (which will contain four elements) will be evaluated twice. For example, take the above-mentioned input:
-
-* ![sliding_window](./images/sliding_window.png)
-
-* As you can see, there are four overlapping elements between the subarray (indexed from `0-4`) and the subarray (indexed from `1-5`). Can we somehow reuse the sum we have calculated for the overlapping elements?
-
-* The efficient way to solve this problem would be to visualize each subarray as a sliding window of `5` elements. This means that we will slide the window by one element when we move on to the next subarray. To reuse the sum from the previous subarray, we will subtract the element going out of the window and add the element now being included in the sliding window. This will save us from going through the whole subarray to find the sum and, as a result, the algorithm complexity will reduce to `O(N)`.
-
-* ![sliding_window2](./images/sliding_window2.png)
-
-* ```java
-    public static double[] findAveragesV2(int K, int[] arr) {
-        double[] results = new double[arr.length - K + 1];
-
-        int sum = 0;
-        // O(K)
-        for (int i = 0; i < K; i++) {
-            sum += arr[i];
-        }
-        int i = 0;
-        results[i] = sum/K;
-
-        int firstIndex = 0;
-        int lastIndex = K-1;
-
-        // O(N-K)
-        while (true) {
-            sum -= arr[firstIndex];
-            firstIndex++;
-            lastIndex++;
-            if (lastIndex == arr.length) break;
-            sum += arr[lastIndex];
-            results[++i] = sum/K;
-        }
-        
-        return results;
-    }
-    ```
+        ```
 
 * In the following chapters, we will apply the Sliding Window approach to solve a few problems.
 
@@ -187,8 +192,8 @@
         ```
 
 * This problem follows the Sliding Window pattern, and we can use a similar strategy as discussed in Maximum Sum Subarray of Size K. There is one difference though: in this problem, the sliding window size is not fixed. Here is how we will solve this problem:
-    * First, we will add-up elements from the beginning of the array until their sum becomes greater than or equal to ‘S.’
-    * These elements will constitute our sliding window. We are asked to find the smallest such window having a sum greater than or equal to ‘S.’ We will remember the length of this window as the smallest window so far.
+    * First, we will add-up elements from the beginning of the array until their sum becomes greater than or equal to `S`.
+    * These elements will constitute our sliding window. We are asked to find the smallest such window having a sum greater than or equal to `S`. We will remember the length of this window as the smallest window so far.
     * After this, we will keep adding one element in the sliding window (i.e., slide the window ahead) in a stepwise fashion.
     * In each step, we will also try to shrink the window from the beginning. We will shrink the window until the window’s sum is smaller than ‘S’ again. This is needed as we intend to find the smallest window. This shrinking will also happen in multiple steps; in each step, we will do two things:
         * Check if the current window length is the smallest so far, and if so, remember its length.
@@ -446,4 +451,84 @@
     * The above algorithm’s time complexity will be `O(N)`, where `N` is the number of characters in the input string.
 
 * Space Complexity
-    * The algorithm’s space complexity will be `O(K)`, where `K` is the number of distinct characters in the input string. This also means `K<=N`, because in the worst case, the whole string might not have any duplicate character, so the entire string will be added to the HashMap. Having said that, since we can expect a fixed set of characters in the input string (e.g., **26 for English letters**), we can say that the algorithm runs in fixed space `O(1)`; in this case, we can use a fixed-size array instead of the HashMap.
+    * The algorithm’s space complexity will be `O(K)`, where `K` is the number of distinct characters in the input string. This also means `K<=N`, because in the worst case, the whole string might not have any duplicate character, so the entire string will be added to the HashMap. Having said that, since we can expect a fixed set of characters in the input string (e.g., **26 for English letters**), we can say that the algorithm runs in fixed space `O(1)`; in this case, we can use a fixed-size array instead of the `HashMap`.
+
+### Longest Substring with Same Letters after Replacement (hard)
+
+* Given a string with **lowercase letters only**, if you are allowed to replace no more than `k` letters with any letter, find the length of the **longest substring having the same letters** after replacement.
+
+* Examples
+
+    * ```
+        Input: String="aabccbb", k=2
+        Output: 5
+        Explanation: Replace the two 'c' with 'b' to have a longest repeating substring "bbbbb".
+        ```
+
+    * ```
+        Input: String="abbcb", k=1
+        Output: 4
+        Explanation: Replace the 'c' with 'b' to have a longest repeating substring "bbbb".
+        ```
+
+    * ```
+        Input: String="abccde", k=1
+        Output: 3
+        Explanation: Replace the 'b' or 'd' with 'c' to have the longest repeating substring "ccc".
+        ```
+
+* Solution
+    * This problem follows the `Sliding Window pattern`, and we can use a similar dynamic sliding window strategy as discussed in `Longest Substring with Distinct Characters`. We can use a `HashMap` to count the **frequency of each letter**.
+        * We will iterate through the string to add one letter at a time in the window.
+        * We will also keep track of the **count of the maximum repeating letter** in any window (let’s call it **maxRepeatLetterCount**).
+        * So, at any time, we know that we do have a window with one letter repeating **maxRepeatLetterCount** times; this means we should try to replace the remaining letters.
+            * If the remaining letters are less than or equal to `k`, we can replace them all.
+            * If we have more than `k` remaining letters, we should shrink the window as we cannot replace more than `k` letters.
+  
+    * While shrinking the window, we don’t need to update maxRepeatLetterCount   (hence, it represents the maximum repeating count of ANY letter for ANY window). Why don’t we need to update this count when we shrink the window? Since we have to replace all the remaining letters to get the longest substring having the same letter in any window, we can’t get a better answer from any other window even though all occurrences of the letter with frequency maxRepeatLetterCount is not in the current window.
+
+* Code
+
+    * ```java
+        import java.util.*;
+
+        class CharacterReplacement {
+            public static int findLength(String str, int k) {
+                int windowStart = 0, maxLength = 0, maxRepeatLetterCount = 0;
+                Map<Character, Integer> letterFrequencyMap = new HashMap<>();
+                // try to extend the range [windowStart, windowEnd]
+                for (int windowEnd = 0; windowEnd < str.length(); windowEnd++) {
+                    char rightChar = str.charAt(windowEnd);
+                    letterFrequencyMap.put(rightChar, letterFrequencyMap.getOrDefault(rightChar, 0) + 1);
+                    maxRepeatLetterCount = Math.max(maxRepeatLetterCount, letterFrequencyMap.get(rightChar));
+
+                    // current window size is from windowStart to windowEnd, overall we have a letter 
+                    // which is repeating 'maxRepeatLetterCount' times, this means we can have a window
+                    //  which has one letter repeating 'maxRepeatLetterCount' times and the remaining 
+                    // letters we should replace. If the remaining letters are more than 'k', it is the
+                    // time to shrink the window as we are not allowed to replace more than 'k' letters
+                    if (windowEnd - windowStart + 1 - maxRepeatLetterCount > k) {
+                        char leftChar = str.charAt(windowStart);
+                        letterFrequencyMap.put(leftChar, letterFrequencyMap.get(leftChar) - 1);
+                        windowStart++;
+                    }
+
+                    maxLength = Math.max(maxLength, windowEnd - windowStart + 1);
+                }
+
+                return maxLength;
+            }
+
+            public static void main(String[] args) {
+                System.out.println(CharacterReplacement.findLength("aabccbb", 2));
+                System.out.println(CharacterReplacement.findLength("abbcb", 1));
+                System.out.println(CharacterReplacement.findLength("abccde", 1));
+            }
+        }
+        ```
+
+* Time Complexity
+    * The above algorithm’s time complexity will be `O(N)`, where `N` is the number of letters in the input string.
+
+* Space Complexity
+    * As we expect only the lower case letters in the input string, we can conclude that the space complexity will be `O(26)` to store each letter’s frequency in the HashMap, which is asymptotically equal to `O(1)`.
