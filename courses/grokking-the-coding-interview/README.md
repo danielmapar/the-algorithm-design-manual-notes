@@ -15,6 +15,7 @@
         ```
 
 * Code
+    * `solution1.java`
     * ```java
         import java.util.Arrays;
 
@@ -54,6 +55,7 @@
     * ![sliding_window2](./images/sliding_window2.png)
 
 * Code
+    * `solution1.java`
     * ```java
         public static double[] findAveragesV2(int K, int[] arr) {
             double[] results = new double[arr.length - K + 1];
@@ -107,31 +109,33 @@
 
 * ![sliding_window3](./images/sliding_window3.png)
 
-* ```java
-    class MaxSumSubArrayOfSizeK {
-        public static int findMaxSumSubArray(int k, int[] arr) {
-            int maxSum = 0, windowSum;
-            for (int i = 0; i <= arr.length - k; i++) {
-                windowSum = 0;
-                for (int j = i; j < i + k; j++) {
-                    windowSum += arr[j];
+* Code
+    * `solution2.java`
+    * ```java
+        class MaxSumSubArrayOfSizeK {
+            public static int findMaxSumSubArray(int k, int[] arr) {
+                int maxSum = 0, windowSum;
+                for (int i = 0; i <= arr.length - k; i++) {
+                    windowSum = 0;
+                    for (int j = i; j < i + k; j++) {
+                        windowSum += arr[j];
+                    }
+                    maxSum = Math.max(maxSum, windowSum);
                 }
-                maxSum = Math.max(maxSum, windowSum);
+
+                return maxSum;
             }
-
-            return maxSum;
+            
+            public static void main(String[] args) {
+                System.out.println("Maximum sum of a subarray of size K: "
+                    + MaxSumSubArrayOfSizeK.findMaxSumSubArray(3, new int[] { 2, 1, 5, 1, 3, 2 }));
+                System.out.println("Maximum sum of a subarray of size K: "
+                    + MaxSumSubArrayOfSizeK.findMaxSumSubArray(2, new int[] { 2, 3, 4, 1, 5 }));
+            }
         }
-        
-        public static void main(String[] args) {
-            System.out.println("Maximum sum of a subarray of size K: "
-                + MaxSumSubArrayOfSizeK.findMaxSumSubArray(3, new int[] { 2, 1, 5, 1, 3, 2 }));
-            System.out.println("Maximum sum of a subarray of size K: "
-                + MaxSumSubArrayOfSizeK.findMaxSumSubArray(2, new int[] { 2, 3, 4, 1, 5 }));
-        }
-    }
-    ```
+        ```
 
-    * The above algorithm’s time complexity will be `O(N∗K)`, where `N` is the total number of elements in the given array. Is it possible to find a better algorithm than this?
+        * The above algorithm’s time complexity will be `O(N∗K)`, where `N` is the total number of elements in the given array. Is it possible to find a better algorithm than this?
 
 * A better approach
 
@@ -143,26 +147,29 @@
 
 * This approach will save us from re-calculating the sum of the overlapping part of the sliding window. Here is what our algorithm will look like:
 
-* ```java
-    public static double findMaxSumSubArrayV2(int K, int[] arr) {
-        int sum = 0;
-        // O(K)
-        for (int i = 0; i < K; i++) {
-            sum += arr[i];
+* Code
+    * `solution2.java`
+    * ```java
+        public static double findMaxSumSubArrayV2(int K, int[] arr) {
+            int sum = 0;
+            // O(K)
+            for (int i = 0; i < K; i++) {
+                sum += arr[i];
+            }
+            int maxSum = sum;
+            
+            // O(N-K)
+            for (int firstIndex = 0, lastIndex = K; lastIndex < arr.length; firstIndex++, lastIndex++) {
+                sum -= arr[firstIndex];
+                sum += arr[lastIndex];
+                maxSum = Math.max(maxSum, sum);
+            }
+            
+            return maxSum;
         }
-        int maxSum = sum;
-        
-        // O(N-K)
-        for (int firstIndex = 0, lastIndex = K; lastIndex < arr.length; firstIndex++, lastIndex++) {
-            sum -= arr[firstIndex];
-            sum += arr[lastIndex];
-            maxSum = Math.max(maxSum, sum);
-        }
-        
-        return maxSum;
-    }
-    ```
+        ```
 
+* Complexity
     * The time complexity of the above algorithm will be `O(N)`.
 
     * The algorithm runs in constant space `O(1)`.
@@ -198,38 +205,39 @@
     * In each step, we will also try to shrink the window from the beginning. We will shrink the window until the window’s sum is smaller than ‘S’ again. This is needed as we intend to find the smallest window. This shrinking will also happen in multiple steps; in each step, we will do two things:
         * Check if the current window length is the smallest so far, and if so, remember its length.
         * Subtract the first element of the window from the running sum to shrink the sliding window.
-
-* ```java
-    class MinSizeSubArraySum {
-        public static int findMinSubArray(int S, int[] arr) {
-            int windowSum = 0, minLength = Integer.MAX_VALUE;
-            int windowStart = 0;
-            for (int windowEnd = 0; windowEnd < arr.length; windowEnd++) {
-                windowSum += arr[windowEnd]; // add the next element
-                // shrink the window as small as possible until the 'windowSum' is smaller than 'S'
-                while (windowSum >= S) {
-                    minLength = Math.min(minLength, windowEnd - windowStart + 1);
-                    windowSum -= arr[windowStart]; // subtract the element going out
-                    windowStart++; // slide the window ahead
+* Code  
+    * `solution3.java`
+    * ```java
+        class MinSizeSubArraySum {
+            public static int findMinSubArray(int S, int[] arr) {
+                int windowSum = 0, minLength = Integer.MAX_VALUE;
+                int windowStart = 0;
+                for (int windowEnd = 0; windowEnd < arr.length; windowEnd++) {
+                    windowSum += arr[windowEnd]; // add the next element
+                    // shrink the window as small as possible until the 'windowSum' is smaller than 'S'
+                    while (windowSum >= S) {
+                        minLength = Math.min(minLength, windowEnd - windowStart + 1);
+                        windowSum -= arr[windowStart]; // subtract the element going out
+                        windowStart++; // slide the window ahead
+                    }
                 }
+
+                return minLength == Integer.MAX_VALUE ? 0 : minLength;
             }
 
-            return minLength == Integer.MAX_VALUE ? 0 : minLength;
+            public static void main(String[] args) {
+                int result = MinSizeSubArraySum.findMinSubArray(7, new int[] { 2, 1, 5, 2, 3, 2 });
+                System.out.println("Smallest subarray length: " + result);
+                result = MinSizeSubArraySum.findMinSubArray(7, new int[] { 2, 1, 5, 2, 8 });
+                System.out.println("Smallest subarray length: " + result);
+                result = MinSizeSubArraySum.findMinSubArray(8, new int[] { 3, 4, 1, 1, 6 });
+                System.out.println("Smallest subarray length: " + result);
+            }
         }
-
-        public static void main(String[] args) {
-            int result = MinSizeSubArraySum.findMinSubArray(7, new int[] { 2, 1, 5, 2, 3, 2 });
-            System.out.println("Smallest subarray length: " + result);
-            result = MinSizeSubArraySum.findMinSubArray(7, new int[] { 2, 1, 5, 2, 8 });
-            System.out.println("Smallest subarray length: " + result);
-            result = MinSizeSubArraySum.findMinSubArray(8, new int[] { 3, 4, 1, 1, 6 });
-            System.out.println("Smallest subarray length: " + result);
-        }
-    }
-    ```
+        ```
 
 * Time Complexity
-  *  The time complexity of the above algorithm will be `O(N)`. The outer for loop runs for all elements, and the inner while loop processes each element only once; therefore, the time complexity of the algorithm will be `O(N+N)`, which is asymptotically equivalent to `O(N)`.
+    *  The time complexity of the above algorithm will be `O(N)`. The outer for loop runs for all elements, and the inner while loop processes each element only once; therefore, the time complexity of the algorithm will be `O(N+N)`, which is asymptotically equivalent to `O(N)`.
 
 * Space Complexity
   * The algorithm runs in constant space `O(1)`
@@ -266,46 +274,49 @@
         * While shrinking, we’ll decrement the character’s frequency going out of the window and remove it from the `HashMap` if its frequency becomes `zero`.
         * At the end of each step, we’ll check if the current window length is the longest so far, and if so, remember its length.
 
-* ```java
-    import java.util.*;
+* Code
+    * `solution4.java`
 
-    class LongestSubstringKDistinct {
-        public static int findLength(String str, int k) {
-            if (str == null || str.length() == 0 || str.length() < k)
-            throw new IllegalArgumentException();
+    * ```java
+        import java.util.*;
 
-            int windowStart = 0, maxLength = 0;
-            Map<Character, Integer> charFrequencyMap = new HashMap<>();
-            // in the following loop we'll try to extend the range [windowStart, windowEnd]
-            for (int windowEnd = 0; windowEnd < str.length(); windowEnd++) {
-                char rightChar = str.charAt(windowEnd);
-                charFrequencyMap.put(rightChar, charFrequencyMap.getOrDefault(rightChar, 0) + 1);
-                // shrink the sliding window, until we are left with 'k' distinct characters in 
-                // the frequency map
-                while (charFrequencyMap.size() > k) {
-                    char leftChar = str.charAt(windowStart);
-                    charFrequencyMap.put(leftChar, charFrequencyMap.get(leftChar) - 1);
-                    if (charFrequencyMap.get(leftChar) == 0) {
-                        charFrequencyMap.remove(leftChar);
+        class LongestSubstringKDistinct {
+            public static int findLength(String str, int k) {
+                if (str == null || str.length() == 0 || str.length() < k)
+                throw new IllegalArgumentException();
+
+                int windowStart = 0, maxLength = 0;
+                Map<Character, Integer> charFrequencyMap = new HashMap<>();
+                // in the following loop we'll try to extend the range [windowStart, windowEnd]
+                for (int windowEnd = 0; windowEnd < str.length(); windowEnd++) {
+                    char rightChar = str.charAt(windowEnd);
+                    charFrequencyMap.put(rightChar, charFrequencyMap.getOrDefault(rightChar, 0) + 1);
+                    // shrink the sliding window, until we are left with 'k' distinct characters in 
+                    // the frequency map
+                    while (charFrequencyMap.size() > k) {
+                        char leftChar = str.charAt(windowStart);
+                        charFrequencyMap.put(leftChar, charFrequencyMap.get(leftChar) - 1);
+                        if (charFrequencyMap.get(leftChar) == 0) {
+                            charFrequencyMap.remove(leftChar);
+                        }
+                        windowStart++; // shrink the window
                     }
-                    windowStart++; // shrink the window
+                    // remember the maximum length so far
+                    maxLength = Math.max(maxLength, windowEnd - windowStart + 1);
                 }
-                // remember the maximum length so far
-                maxLength = Math.max(maxLength, windowEnd - windowStart + 1);
+                return maxLength;
             }
-            return maxLength;
-        }
 
-        public static void main(String[] args) {
-            System.out.println("Length of the longest substring: " 
-            + LongestSubstringKDistinct.findLength("araaci", 2));
-            System.out.println("Length of the longest substring: " 
-            + LongestSubstringKDistinct.findLength("araaci", 1));
-            System.out.println("Length of the longest substring: " 
-            + LongestSubstringKDistinct.findLength("cbbebi", 3));
+            public static void main(String[] args) {
+                System.out.println("Length of the longest substring: " 
+                + LongestSubstringKDistinct.findLength("araaci", 2));
+                System.out.println("Length of the longest substring: " 
+                + LongestSubstringKDistinct.findLength("araaci", 1));
+                System.out.println("Length of the longest substring: " 
+                + LongestSubstringKDistinct.findLength("cbbebi", 3));
+            }
         }
-    }
-    ```
+        ```
 
 * Time Complexity
 
@@ -344,6 +355,7 @@
     * This problem follows the `Sliding Window` pattern and is quite similar to `Longest Substring with K Distinct Characters`. In this problem, we need to find the length of the longest subarray with no **more than two distinct characters** (or fruit types!). This transforms the current problem into `Longest Substring with K Distinct Characters where K=2`.
 
 * Code
+    * `solution5.java`
     * ```java
         import java.util.*;
 
@@ -409,7 +421,8 @@
 
 * Solution
     * This problem follows the Sliding Window pattern, and we can use a similar dynamic sliding window strategy as discussed in Longest Substring with K Distinct Characters. We can use a HashMap to remember the last index of each character we have processed. Whenever we get a duplicate character, we will shrink our sliding window to ensure that we always have distinct characters in the sliding window.
-  
+    
+    * `solution6.java`
     * ```java
         import java.util.*;
 
@@ -488,7 +501,7 @@
     * While shrinking the window, we don’t need to update maxRepeatLetterCount   (hence, it represents the maximum repeating count of ANY letter for ANY window). Why don’t we need to update this count when we shrink the window? Since we have to replace all the remaining letters to get the longest substring having the same letter in any window, we can’t get a better answer from any other window even though all occurrences of the letter with frequency maxRepeatLetterCount is not in the current window.
 
 * Code
-
+    * `solution7.java`
     * ```java
         import java.util.*;
 
