@@ -545,3 +545,72 @@
 
 * Space Complexity
     * As we expect only the lower case letters in the input string, we can conclude that the space complexity will be `O(26)` to store each letter’s frequency in the HashMap, which is asymptotically equal to `O(1)`.
+
+### Longest Subarray with Ones after Replacement (hard)
+
+* Given an array containing `0`s and `1`s, if you are allowed to replace no more than `k` `0`s with `1`s, find the length of the longest contiguous subarray having all `1`s.
+
+* Examples
+
+    * ```
+        Input: Array=[0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1], k=2
+        Output: 6
+        Explanation: Replace the '0' at index 5 and 8 to have the longest contiguous subarray of 1s having length 6.
+        ```
+
+    * ```
+        Input: Array=[0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 1, 1], k=3
+        Output: 9
+        Explanation: Replace the '0' at index 6, 9, and 10 to have the longest contiguous subarray of 1s having length 9.
+        ```
+
+* Solution
+
+    * This problem follows the `Sliding Window` pattern and is quite similar to `Longest Substring with same Letters after Replacement`. The only difference is that, in the problem, we only have two characters (`1`s and `0`s) in the input arrays.
+
+    * Following a similar approach, we’ll iterate through the array to add one number at a time in the window. We’ll also keep track of the `maximum number of repeating 1`s in the current window (let’s call it maxOnesCount). So at any time, we know that we can have a window with 1s repeating `maxOnesCount` time, so we should try to replace the remaining `0`s. If we have more than `k` remaining `0`s, we should shrink the window as we are not allowed to replace more than `k` `0`s.
+
+* Code  
+    * `solution8.java`
+    * ```java
+        class ReplacingOnes {
+            public static int findLength(int[] arr, int k) {
+                int windowStart = 0, maxLength = 0, maxOnesCount = 0;
+                // try to extend the range [windowStart, windowEnd]
+                for (int windowEnd = 0; windowEnd < arr.length; windowEnd++) {
+                    if (arr[windowEnd] == 1)
+                        maxOnesCount++;
+
+                    // current window size is from windowStart to windowEnd, overall we have a maximum 
+                    // of 1s repeating a maximum of 'maxOnesCount' times, this means that we can have a
+                    //  window with 'maxOnesCount' 1s and the remaining are 0s which should replace 
+                    // with 1s. Now, if the remaining 0s are more than 'k', it is the time to shrink 
+                    // the window as we are not allowed to replace more than 'k' Os.
+                    if (windowEnd - windowStart + 1 - maxOnesCount > k) {
+                        if (arr[windowStart] == 1)
+                        maxOnesCount--;
+                        windowStart++;
+                }
+
+                maxLength = Math.max(maxLength, windowEnd - windowStart + 1);
+                }
+
+                return maxLength;
+            }
+
+            public static void main(String[] args) {
+                System.out.println(
+                ReplacingOnes.findLength(new int[] { 0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1 }, 2));
+                System.out.println(
+                ReplacingOnes.findLength(new int[] { 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 1, 1 }, 3));
+            }
+        }
+        ```
+
+* Time Complexity
+
+    * The above algorithm’s time complexity will be `O(N)`, where `N` is the count of numbers in the input array.
+
+* Space Complexity
+
+    * The algorithm runs in constant space `O(1)`.
