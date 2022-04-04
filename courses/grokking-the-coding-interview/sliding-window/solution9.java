@@ -57,16 +57,18 @@ class PermutationInString {
 
             if (patternChars.containsKey(c)) {
                 patternChars.put(c, patternChars.get(c) - 1);
-                matchCharsCount++;
+                if (patternChars.get(c) == 0)
+                    matchCharsCount++;
             }
 
-            if (matchCharsCount == pattern.length()) return true;
+            if (matchCharsCount == patternChars.size()) return true;
 
             if (pattern.length() == (windowEnd-windowStart+1)) {
                 char startChar = str.charAt(windowStart);
                 if (patternChars.containsKey(startChar)) {
+                    if (patternChars.get(startChar) == 0)
+                        matchCharsCount--;
                     patternChars.put(startChar, patternChars.get(startChar) + 1);
-                    matchCharsCount--;
                 }
                 windowStart++;
             }
@@ -116,6 +118,6 @@ class PermutationInString {
         System.out.println(findPermutation("bcdxabcdy", "bcdyabcdx"));
         System.out.println(findPermutation("aaacb", "abc"));
         System.out.println("-------------");
-        System.out.println(isPatternInStringV2("aaaaabaaaaaaaaaaaacccaaaaaaaaavaaaaaaasdas", "aaaaaaaaaaaaaaaaa"));
+        System.out.println(isPatternInStringV2("aaaaa", "aaaab"));
     }
 }
