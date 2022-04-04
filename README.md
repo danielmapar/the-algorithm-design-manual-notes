@@ -438,4 +438,3 @@ f(n) = âˆšn: The square root is not very esoteric, but represents the class of â
     * The difficulty is the height of the tree depends upon where the pivot element ends up in each partition. This could lead to `O(n^2)` if we use the last element as the pivot of a sorted array like: `[1,2,3,4,5]`. 
 
     * A well implemented quick sort can be 2 to 3 times faster compared to merge sort and heap sort. However, this mostly holds for sorting in memory. In case you want to sort data that is too big to fit in memory, merge sort is the winner.
-
