@@ -1580,3 +1580,425 @@
 
 * Space Complexity
     * The algorithm runs in constant space `O(1)`.
+
+## Pattern: Islands (Matrix Traversal)
+
+### Number of Islands (easy)
+
+* Given a 2D array (i.e., a `matrix`) containing only `1`s (land) and `0`s (water), count the number of islands in it.
+
+* An island is a connected set of `1`s (land) and is surrounded by either an `edge` or `0`s (water). Each cell is considered connected to other cells horizontally or vertically (not diagonally).
+
+* Examples
+    * ```
+        Input: new int[][]{
+            {0, 1, 1, 1, 0},
+            {0, 0, 0, 1, 1},
+            {0, 1, 1, 1, 0},
+            {0, 1, 1, 0, 0},
+            {0, 0, 0, 0, 0}
+        }
+        Output: 1
+        ```
+
+    * ```
+        Input: new int[][]{
+            {1, 0, 1, 0, 0},
+            {1, 0, 1, 0, 1},
+            {0, 0, 0, 0, 0},
+            {0, 1, 0, 1, 0},
+            {0, 0, 0, 0, 0}
+        }
+        Output: 5
+        ```
+
+    * ```
+        Input: new int[][]{
+            {1, 1, 1, 0, 0},
+            {0, 1, 0, 0, 1},
+            {0, 0, 1, 1, 0},
+            {0, 0, 1, 0, 0},
+            {0, 0, 1, 0, 0}
+        }
+        Output: 3
+        ```
+
+* Solution
+
+    * We can traverse the matrix linearly to find islands.
+
+    * Whenever we find a cell with the value `1` (i.e., land), we have found an island. Using that cell as the root node, we will perform a `Depth First Search (DFS)` or `Breadth First Search (BFS)` to find all of its connected land cells. During our `DFS` or `BFS` traversal, we will find and mark all the horizontally and vertically connected land cells. 
+
+    * We need to have a mechanism to mark each land cell to ensure that each land cell is visited only once. To mark a cell visited, we have two options:
+        * We can update the given input matrix. Whenever we see a `1`, we will make it `0`.
+        * A separate boolean matrix can be used to record whether or not each cell has been visited. 
+
+    * Following is the `DFS` or `BFS` traversal of the example-2 mentioned above:
+
+    * ![islands_bfs_dfs](./images/islands_bfs_dfs.png)
+
+    * By following the above algorithm, every time DFS or BFS is triggered, we are sure that we have found an island. We will keep a running count to calculate the total number of islands.
+
+    * Bellow, we will see three solutions based on:
+        * DFS
+        * BFS
+        * BFS with visited matrix
+
+* Code (DFS)
+
+* ```java
+    import java.util.*;
+
+    class NumOfIslandsDFS {
+        public static int countIslands(int[][] matrix) {
+
+            int rows = matrix.length;
+            int cols = matrix[0].length;
+            int totalIslands = 0;
+
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < cols; j++) {
+                    if (matrix[i][j] == 1) { // only if the cell is a land
+                        // we have found an island
+                        totalIslands++;
+                        visitIslandDFS(matrix, i, j);
+                    }
+                }
+            }
+            return totalIslands;
+        }
+
+        private static void visitIslandDFS(int[][] matrix, int x, int y) {
+            if (x < 0 || x >= matrix.length || y < 0 || y >= matrix[0].length)
+                return; // return, if it is not a valid cell
+            if (matrix[x][y] == 0)
+                return; // return, if it is a water cell
+
+            matrix[x][y] = 0; // mark the cell visited by making it a water cell
+
+            // recursively visit all neighboring cells (horizontally & vertically)
+            visitIslandDFS(matrix, x + 1, y); // lower cell
+            visitIslandDFS(matrix, x - 1, y); // upper cell
+            visitIslandDFS(matrix, x, y + 1); // right cell
+            visitIslandDFS(matrix, x, y - 1); // left cell
+        }
+
+        public static void main(String[] args) {
+            System.out.println(NumOfIslandsDFS.countIslands(
+                new int[][] {
+                    { 0, 1, 1, 1, 0 },
+                    { 0, 0, 0, 1, 1 },
+                    { 0, 1, 1, 1, 0 },
+                    { 0, 1, 1, 0, 0 },
+                    { 0, 0, 0, 0, 0 }
+                }));
+
+            System.out.println(NumOfIslandsDFS.countIslands(
+                new int[][] {
+                    { 1, 1, 1, 0, 0 },
+                    { 0, 1, 0, 0, 1 },
+                    { 0, 0, 1, 1, 0 },
+                    { 0, 0, 1, 0, 0 },
+                    { 0, 0, 1, 0, 0 }
+                }));
+        }
+    }
+    ```
+
+* Code (BFS)
+    * ```java
+        import java.util.*;
+
+        class NumOfIslandsBFS {
+            public static int countIslands(int[][] matrix) {
+
+                int rows = matrix.length;
+                int cols = matrix[0].length;
+                int totalIslands = 0;
+
+                for (int i = 0; i < rows; i++) {
+                    for (int j = 0; j < cols; j++) {
+                        if (matrix[i][j] == 1) { // only if the cell is a land
+                            // we have found an island
+                            totalIslands++;
+                            visitIslandBFS(matrix, i, j);
+                        }
+                    }
+                }
+                return totalIslands;
+            }
+
+            private static void visitIslandBFS(int[][] matrix, int x, int y) {
+                Queue<int[]> neighbors = new LinkedList<>();
+                neighbors.add(new int[] { x, y });
+                while (!neighbors.isEmpty()) {
+                    int row = neighbors.peek()[0];
+                    int col = neighbors.peek()[1];
+                    neighbors.remove();
+
+                    if (row < 0 || row >= matrix.length || col < 0 || col >= matrix[0].length)
+                        continue; // continue, if it is not a valid cell
+                    if (matrix[row][col] == 0)
+                        continue; // continue if it is a water cell
+
+                    matrix[row][col] = 0; // mark the cell visited by making it a water cell
+
+                    // insert all neighboring cells to the queue for BFS
+                    neighbors.add(new int[] { row + 1, col }); // lower cell
+                    neighbors.add(new int[] { row - 1, col }); // upper cell
+                    neighbors.add(new int[] { row, col + 1 }); // right cell
+                    neighbors.add(new int[] { row, col - 1 }); // left cell
+                }
+            }
+
+            public static void main(String[] args) {
+                System.out.println(NumOfIslandsBFS.countIslands(
+                    new int[][] {
+                        { 0, 1, 1, 1, 0 },
+                        { 0, 0, 0, 1, 1 },
+                        { 0, 1, 1, 1, 0 },
+                        { 0, 1, 1, 0, 0 },
+                        { 0, 0, 0, 0, 0 }
+                    }));
+
+                System.out.println(NumOfIslandsBFS.countIslands(
+                    new int[][] {
+                        { 1, 1, 1, 0, 0 },
+                        { 0, 1, 0, 0, 1 },
+                        { 0, 0, 1, 1, 0 },
+                        { 0, 0, 1, 0, 0 },
+                        { 0, 0, 1, 0, 0 }
+                    }));
+            }
+        }
+        ```
+
+* Code (BFS with visited matrix)
+
+* ```java
+    import java.util.*;
+
+    class NumOfIslandsVisited {
+        public static int countIslands(int[][] matrix) {
+            int rows = matrix.length;
+            int cols = matrix[0].length;
+            boolean[][] visited = new boolean[rows][cols];
+            int totalIsland = 0;
+
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < cols; j++) {
+                        // if the cell has not been visited before and is a land
+                        if (!visited[i][j] && matrix[i][j] == 1) {
+                        // we have found an island
+                        totalIsland++;
+                        visitIslandBFS(matrix, visited, i, j);
+                    }
+                }
+            }
+            return totalIsland;
+        }
+
+        private static void visitIslandBFS(int[][] matrix, boolean[][] visited, int x, int y) {
+            Queue<int[]> neighbors = new LinkedList<>();
+            neighbors.add(new int[] { x, y });
+            while (!neighbors.isEmpty()) {
+                int row = neighbors.peek()[0];
+                int col = neighbors.peek()[1];
+                neighbors.remove();
+
+                if (row < 0 || col < 0 || row >= matrix.length || col >= matrix[0].length)
+                    continue; // continue, if it is not a valid cell
+                if (matrix[row][col] == 0 || visited[row][col])
+                    continue; // continue if the cell is water or visited
+
+                visited[row][col] = true; // mark the visited array
+
+                // insert all neighboring cells to the queue for BFS
+                neighbors.add(new int[] { row + 1, col }); // lower cell
+                neighbors.add(new int[] { row - 1, col }); // upper cell
+                neighbors.add(new int[] { row, col + 1 }); // right cell
+                neighbors.add(new int[] { row, col - 1 }); // left cell
+            }
+        }
+
+        public static void main(String[] args) {
+                System.out.println(NumOfIslandsVisited.countIslands(
+                    new int[][] {
+                        { 0, 1, 1, 1, 0 },
+                        { 0, 0, 0, 1, 1 },
+                        { 0, 1, 1, 1, 0 },
+                        { 0, 1, 1, 0, 0 },
+                        { 0, 0, 0, 0, 0 }
+                    }));
+
+                System.out.println(NumOfIslandsVisited.countIslands(
+                    new int[][] {
+                        { 1, 1, 1, 0, 0 },
+                        { 0, 1, 0, 0, 1 },
+                        { 0, 0, 1, 1, 0 },
+                        { 0, 0, 1, 0, 0 },
+                        { 0, 0, 1, 0, 0 }
+                    }));
+        }
+    }
+    ```
+
+* Code
+    * `solution1.java`
+    * ```java
+        package islands;
+
+        import java.util.ArrayDeque;
+        import java.util.Deque;
+
+        class NumberOfIslands {
+
+            public static void searchGrid(int[][] map, int line, int column, int lineLength, int columnLength) {
+                map[line][column] = 0;
+                if (line+1 < lineLength && map[line+1][column] == 1) {
+                    searchGrid(map, line+1, column, lineLength, columnLength);
+                }
+                if (line-1 > 0 && map[line-1][column] == 1) {
+                    searchGrid(map, line-1, column, lineLength, columnLength);
+                }
+                if (column+1 < columnLength && map[line][column+1] == 1) {
+                    searchGrid(map, line, column+1, lineLength, columnLength);
+                }
+                if (column-1 > 0 && map[line][column-1] == 1) {
+                    searchGrid(map, line, column-1, lineLength, columnLength);
+                }
+            }
+
+            public static void searchGridV2(int[][] map, int line, int column, int lineLength, int columnLength) {
+                Deque<int[]> queue = new ArrayDeque<int[]>();
+
+                queue.addLast(new int[]{line, column});
+
+                while(queue.size() > 0) {
+                    int[] pos = queue.removeFirst();
+                    int currLine = pos[0];
+                    int currColumn = pos[1];
+                    map[currLine][currColumn] = 0;
+
+                    if (currLine+1 < lineLength && map[currLine+1][currColumn] == 1) {
+                        queue.addLast(new int[]{currLine+1, currColumn});
+                    }
+                    if (currLine-1 > 0 && map[currLine-1][currColumn] == 1) {
+                        queue.addLast(new int[]{currLine-1, currColumn});
+                    }
+                    if (currColumn+1 < columnLength && map[currLine][currColumn+1] == 1) {
+                        queue.addLast(new int[]{currLine, currColumn+1});
+                    }
+                    if (currColumn-1 > 0 && map[currLine][currColumn-1] == 1) {
+                        queue.addLast(new int[]{currLine, currColumn-1});
+                    }
+                }
+            }
+
+            public static int countNumberOfIslands(int[][] map) {
+                int numberOfIslands = 0;
+
+                if (map.length == 0) return numberOfIslands;
+
+                int lineLength = map.length;
+                int columnLength = map[0].length;
+
+                for (int line = 0; line < lineLength; line++) {
+                    for (int column = 0; column < columnLength; column++) {
+                        if (map[line][column] == 1) {
+                            // searchGrid(map, line, column, lineLength, columnLength);
+                            searchGridV2(map, line, column, lineLength, columnLength);
+                            numberOfIslands++;
+                        }
+                    }
+                }
+
+                return numberOfIslands;
+            }
+
+
+            public static void main(String[] args) {
+                System.out.println(countNumberOfIslands(new int[][]{
+                    {0, 1, 1, 1, 0},
+                    {0, 0, 0, 1, 1},
+                    {0, 1, 1, 1, 0},
+                    {0, 1, 1, 0, 0},
+                    {0, 0, 0, 0, 0}
+                }));
+
+                System.out.println(countNumberOfIslands(new int[][]{
+                    {1, 0, 1, 0, 0},
+                    {1, 0, 1, 0, 1},
+                    {0, 0, 0, 0, 0},
+                    {0, 1, 0, 1, 0},
+                    {0, 0, 0, 0, 0}
+                }));
+
+                System.out.println(countNumberOfIslands(new int[][]{
+                    {1, 1, 1, 0, 0},
+                    {0, 1, 0, 0, 1},
+                    {0, 0, 1, 1, 0},
+                    {0, 0, 1, 0, 0},
+                    {0, 0, 1, 0, 0}
+                }));
+            }
+        }
+        ```
+
+* Time Complexity (DFS)
+    * Time complexity of the above algorithm will be `O(M*N)`, where `M` is the number of rows and `N` is the number of columns of the input matrix. This is due to the fact that we have to traverse the whole matrix to find the islands.
+
+* Space Complexity (DFS)
+    * DFS recursion stack can go `M*N` deep when the whole matrix is filled with `1`s. Hence, the space complexity will be `O(M*N)`, where `M` is the number of rows and `N` is the number of columns of the input matrix.
+
+* Time Complexity (BFS)
+    * Time complexity of the above algorithm will be `O(M*N)`, where `M` is the number of rows and `N` is the number of columns.
+
+* Space Complexity (BFS)
+    * Space complexity of the above algorithm will be `O(min(M*N))`. In the worst case, when the matrix is completely filled with land cells, the size of the queue can grow up to `min(M*N)`.
+
+* Time Complexity (BFS with matrix)
+    * Time complexity of the above algorithm will be `O(M*N)`, where `M` is the number of rows and `N` is the number of columns.
+
+* Space Complexity (BFS with matrix)
+    * Because of the visited array and max size of the queue, the space complexity will be `O(M*N)`, where `M` is the number of rows and `N` is the number of columns of the input matrix.
+
+### Biggest Island (easy)
+
+* Given a `2D array` (i.e., a matrix) containing only `1`s (land) and `0`s (water), find the biggest island in it. Write a function to return the area of the biggest island. 
+
+* An island is a connected set of `1`s (land) and is surrounded by either an edge or `0`s (water). Each cell is considered connected to other cells horizontally or vertically (not diagonally).
+
+* Examples
+    * ```
+        Input: new int[][]{
+            {0, 1, 1, 1, 0},
+            {0, 0, 0, 1, 1},
+            {0, 1, 1, 1, 0},
+            {0, 1, 1, 0, 0},
+            {0, 0, 0, 0, 0}
+        }
+        Output: 10
+        ```
+
+    * ```
+        Input: new int[][]{
+            {1, 0, 1, 0, 0},
+            {1, 0, 1, 0, 1},
+            {0, 0, 0, 0, 0},
+            {0, 1, 0, 1, 0},
+            {0, 0, 0, 0, 0}
+        }
+        Output: 2
+        ```
+
+    * ```
+        Input: new int[][]{
+            {1, 1, 1, 0, 0},
+            {0, 1, 0, 0, 1},
+            {0, 0, 1, 1, 0},
+            {0, 0, 1, 0, 0},
+            {0, 0, 1, 0, 0}
+        }
+        Output: 4
+        ```
