@@ -2002,3 +2002,71 @@
         }
         Output: 4
         ```
+    
+* Solution
+    * The question follows the Island pattern and is quite similar to Number of Islands problem.
+
+    * We will traverse the matrix linearly to find islands.
+
+    * Whenever we find a cell with the value '1' (i.e., land), we have found an island. Using that cell as the root node, we will perform a `Depth First Search (DFS)` or `Breadth First Search (BFS)` to find all of its connected land cells. During our DFS or BFS traversal, we will find and mark all the horizontally and vertically connected land cells. 
+
+    * We will keep a variable to remember the max area of any island.
+
+* Code (DFS)
+    * ```java
+        import java.util.*;
+
+        class MaxAreaIslandDFS {
+            public static int maxAreaOfIsland(int[][] matrix) {
+
+                int rows = matrix.length;
+                int cols = matrix[0].length;
+                int biggestIslandArea = 0;
+
+                for (int i = 0; i < rows; i++) {
+                    for (int j = 0; j < cols; j++) {
+                        if (matrix[i][j] == 1) { // only if the cell is a land
+                            // we have found an island
+                            biggestIslandArea = Math.max(biggestIslandArea, visitIslandDFS(matrix, i, j));
+                        }
+                    }
+                }
+                return biggestIslandArea;
+            }
+
+            private static int visitIslandDFS(int[][] matrix, int x, int y) {
+                if (x < 0 || x >= matrix.length || y < 0 || y >= matrix[0].length)
+                    return 0; // return, if it is not a valid cell
+                if (matrix[x][y] == 0)
+                    return 0; // return, if it is a water cell
+
+                matrix[x][y] = 0; // mark the cell visited by making it a water cell
+
+                int area = 1; // counting the current cell
+                // recursively visit all neighboring cells (horizontally & vertically)
+                area += visitIslandDFS(matrix, x + 1, y); // lower cell
+                area += visitIslandDFS(matrix, x - 1, y); // upper cell
+                area += visitIslandDFS(matrix, x, y + 1); // right cell
+                area += visitIslandDFS(matrix, x, y - 1); // left cell
+
+                return area;
+            }
+
+            public static void main(String[] args) {
+                System.out.println(MaxAreaIslandDFS.maxAreaOfIsland(
+                    new int[][] {
+                        { 1, 1, 1, 0, 0 },
+                        { 0, 1, 0, 0, 1 },
+                        { 0, 0, 1, 1, 0 },
+                        { 0, 1, 1, 0, 0 },
+                        { 0, 0, 1, 0, 0 }
+                    }));
+            }
+        }
+        ```
+
+* Time Complexity (DFS)
+    * Time complexity of the above algorithm will be `O(M*N)`, where `M` is the number of rows and `N` is the number of columns of the input matrix. This is due to the fact that we have to traverse the whole matrix to find islands.
+
+* Space Complexity (DFS)
+    * DFS recursion stack can go `M*N` deep when the whole matrix is filled with '1's. Hence, the space complexity will be `O(M*N)`, where ‘M’ is the number of rows and 'N' is the number of columns of the input matrix.
