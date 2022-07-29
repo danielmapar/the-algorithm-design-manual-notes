@@ -2070,3 +2070,217 @@
 
 * Space Complexity (DFS)
     * DFS recursion stack can go `M*N` deep when the whole matrix is filled with '1's. Hence, the space complexity will be `O(M*N)`, where ‘M’ is the number of rows and 'N' is the number of columns of the input matrix.
+
+### Flood Fill (easy)
+
+* Any image can be represented by a `2D integer array` (i.e., a matrix) where each cell represents the `pixel value` of the image.
+
+* Flood fill algorithm takes a `starting cell` (i.e., a pixel) and a `color`. The given color is applied to all `horizontally` and `vertically` connected cells with the `same color` as that of the starting cell. Recursively, the algorithm fills cells with the new color until it encounters a cell with a `different color` than the `starting cell`. 
+
+* Given a matrix, a starting cell, and a color, flood fill the matrix.
+
+* Examples
+    * ```
+        Input: new int[][]{
+            {0, 1, 1, 1, 0},
+            {0, 0, 0, 1, 1},
+            {0, 1, 1, 1, 0},
+            {0, 1, 1, 0, 0},
+            {0, 0, 0, 0, 0}
+        }
+        starting_cell: 1, 3
+        new_color: 2
+        Output: new int[][]{
+            {0, 2, 2, 2, 0},
+            {0, 0, 0, 2, 2},
+            {0, 2, 2, 2, 0},
+            {0, 2, 2, 0, 0},
+            {0, 0, 0, 0, 0}
+        }
+        ```
+* Solution
+    * The question follows the Island pattern and is quite similar to Number of Islands problem.
+
+    * From the given starting cell, we can perform a `Depth First Search (DFS)` or `Breadth First Search (BFS)` to find all of its connected cells with the same color. During our DFS or BFS traversal, we will update the cells with the new color.
+
+* Code (DFS)
+    * ```java
+        import java.util.*;
+
+        class FloodFillDFS {
+            public static int[][] floodFill(int[][] matrix, int x, int y, int newColor) {
+
+                if (matrix[x][y] != newColor)
+                    fillDFS(matrix, x, y, matrix[x][y], newColor);
+
+                return matrix;
+
+            }
+
+            private static void fillDFS(int[][] matrix, int x, int y, int oldColor, int newColor) {
+                if (x < 0 || x >= matrix.length || y < 0 || y >= matrix[0].length)
+                    return; // return, if it is not a valid cell
+                if (matrix[x][y] != oldColor)
+                    return; // return, if it is not the required color
+
+                matrix[x][y] = newColor; // update the cell to the new color
+
+                // recursively visit all neighboring cells (horizontally & vertically)
+                fillDFS(matrix, x + 1, y, oldColor, newColor); // lower cell
+                fillDFS(matrix, x - 1, y, oldColor, newColor); // upper cell
+                fillDFS(matrix, x, y + 1, oldColor, newColor); // right cell
+                fillDFS(matrix, x, y - 1, oldColor, newColor); // left cell
+            }
+
+            public static void main(String[] args) {
+                System.out.println(Arrays.deepToString(FloodFillDFS.floodFill(
+                    new int[][] {
+                        { 0, 1, 1, 1, 0 },
+                        { 0, 0, 0, 1, 1 },
+                        { 0, 1, 1, 1, 0 },
+                        { 0, 1, 1, 0, 0 },
+                        { 0, 0, 0, 0, 0 }
+                    }, 1, 3, 2)));
+
+                System.out.println(Arrays.deepToString(FloodFillDFS.floodFill(
+                    new int[][] {
+                        { 0, 0, 0, 0, 0 },
+                        { 0, 0, 0, 0, 0 },
+                        { 0, 0, 1, 1, 0 },
+                        { 0, 0, 1, 0, 0 },
+                        { 0, 0, 1, 0, 0 }
+                    }, 3, 2, 5)));
+            }
+        }
+        ```
+
+* Time Complexity
+    * Time complexity the above algorithm will be `O(M*N)`, where `M` is the number of rows and `N` is the number of columns of the input matrix. This is due to the fact that, in the worst case, we might have to fill the whole matrix.
+
+* Space Complexity
+    * DFS recursion stack can go `M*N` deep when we have to fill the whole matrix. Hence, the space complexity will be `O(M*N)`, where `M` is the number of rows and `N` is the number of columns of the input matrix.
+
+### Number of Closed Islands (easy)
+
+* You are given a 2D matrix containing only `1`s (land) and `0`s (water).
+
+* An island is a connected set of `1`s (land) and is surrounded by either an edge or `0`s (water). Each cell is considered connected to other cells `horizontally` or `vertically` (not diagonally).
+
+* A closed island is an island that is `totally surrounded by 0`s (i.e., water). This means all horizontally and vertically connected cells of a closed island are water. This also means that, by definition, a closed island can't touch an edge (as then the edge cells are not connected to any water cell). 
+
+* Write a function to find the number of closed islands in the given matrix.
+
+* Examples
+    * ```
+        Input: new int[][]{
+            {1, 1, 0, 0, 0},
+            {0, 1, 0, 0, 0},
+            {0, 0, 1, 1, 0},
+            {0, 1, 1, 0, 0},
+            {0, 0, 0, 0, 0}
+        }
+        Output: 1
+        ```
+    * ```
+        Input: new int[][]{
+            {0, 0, 0, 0},
+            {0, 1, 0, 0},
+            {0, 1, 0, 0},
+            {0, 0, 1, 0},
+            {0, 0, 0, 0}
+        }
+        Output: 2
+        ```
+
+* Solution
+    * The question follows the Island pattern and is quite similar to Number of Islands problem.
+
+    * We will traverse the matrix linearly to find islands. We can use the `Depth First Search (DFS)` or `Breadth First Search (BFS)` to traverse an island i.e., to find all of its connected land cells.
+
+    * How do we decide if an island is a `closed island`?
+
+    * To find that out, while traversing an island we need to ensure two things: 
+        * The island does not touch an edge.
+        * Outside boundary of the island are water cells.
+
+    * For the first condition, whenever we go outside the boundary of the matrix during DFS or BFS, it means that one of the cells of the island is touching an edge; so, the island is not closed. Following code will cover this condition:
+
+    * ```java
+        if (x < 0 || x >= matrix.length || y < 0 || y >= matrix[0].length)
+            return false; // returning false since the island is touching an edge
+        ```
+
+    * For the second condition, we need to ensure that all the boundary cells of the island are water. Following code will take care of that: 
+
+    * ```java
+        if (matrix[x][y] == 0 || visited[x][y])
+            return true; // returning true as the island is surrounded by water
+        ```
+
+* Code (DFS)
+    * ```java
+        import java.util.*;
+
+        class NoOfClosedIslandsDFS {
+            public static int countClosedIslands(int[][] matrix) {
+                int rows = matrix.length;
+                int cols = matrix[0].length;
+                int countClosedIslands = 0;
+                boolean[][] visited = new boolean[rows][cols];
+
+                for (int i = 0; i < rows; i++) {
+                    for (int j = 0; j < cols; j++) {
+                        if (matrix[i][j] == 1 && !visited[i][j]) { // only if the cell is a land and not visited
+                            if (isClosedIslandDFS(matrix, visited, i, j))
+                                countClosedIslands++;
+                        }
+                    }
+                }
+                return countClosedIslands;
+            }
+
+            private static boolean isClosedIslandDFS(int[][] matrix, boolean[][] visited, int x, int y) {
+                if (x < 0 || x >= matrix.length || y < 0 || y >= matrix[0].length)
+                    return false; // returning false since the island is touching an edge
+                if (matrix[x][y] == 0 || visited[x][y])
+                    return true; // returning true as the island is surrounded by water
+
+                visited[x][y] = true; // mark the cell visited
+
+                Boolean isClosed = true;
+                // recursively visit all neighboring cells (horizontally & vertically)
+                isClosed &= isClosedIslandDFS(matrix, visited, x + 1, y); // lower cell
+                isClosed &= isClosedIslandDFS(matrix, visited, x - 1, y); // upper cell
+                isClosed &= isClosedIslandDFS(matrix, visited, x, y + 1); // right cell
+                isClosed &= isClosedIslandDFS(matrix, visited, x, y - 1); // left cell
+
+                return isClosed;
+            }
+
+            public static void main(String[] args) {
+                System.out.println(NoOfClosedIslandsDFS.countClosedIslands(
+                    new int[][] {
+                        { 1, 1, 0, 0, 0 },
+                        { 0, 1, 0, 0, 0 },
+                        { 0, 0, 1, 1, 0 },
+                        { 0, 1, 1, 0, 0 },
+                        { 0, 0, 0, 0, 0 }
+                    }));
+
+                System.out.println(NoOfClosedIslandsDFS.countClosedIslands(
+                    new int[][] {
+                        { 0, 0, 0, 0 },
+                        { 0, 1, 0, 0 },
+                        { 0, 1, 0, 0 },
+                        { 0, 0, 1, 0 },
+                        { 0, 0, 0, 0 }
+                    }));
+            }
+        }
+        ```
+
+* Time Complexity
+    * Time complexity of the above algorithm will be `O(M*N)`, where `M` is the number of rows and `N` is the number of columns of the input matrix. This is due to the fact that we have to traverse the whole matrix to find islands.
+
+* Space Complexity
+    * DFS recursion stack can go `M*N` deep when the whole matrix is filled with `1`s. Hence, the space complexity will be `O(M*N)`, where `M` is the number of rows and `N` is the number of columns of the input matrix.
