@@ -2461,7 +2461,7 @@
     * We can start inserting these traversal strings of each island in a `HashSet`. This will ensure that we will not have any duplicate traversal string in the `HashSet`, thus giving us distinct islands. When we finish traversing the matrix, the `HashSet` will contain the distinct traversal path of all islands. Hence, the total number of elements in the `HashSet` will be equal to distinct number of islands.
 
 * Code (DFS)
-
+    * `solution6.java`
     * ```java
         import java.util.*;
 
