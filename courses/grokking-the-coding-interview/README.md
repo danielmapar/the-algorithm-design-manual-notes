@@ -2013,6 +2013,7 @@
     * We will keep a variable to remember the max area of any island.
 
 * Code (DFS)
+    * `solution2.java`
     * ```java
         import java.util.*;
 
@@ -2104,6 +2105,7 @@
     * From the given starting cell, we can perform a `Depth First Search (DFS)` or `Breadth First Search (BFS)` to find all of its connected cells with the same color. During our DFS or BFS traversal, we will update the cells with the new color.
 
 * Code (DFS)
+    * `solution3.java`
     * ```java
         import java.util.*;
 
@@ -2218,6 +2220,7 @@
         ```
 
 * Code (DFS)
+    * `solution4.java`
     * ```java
         import java.util.*;
 
@@ -2284,3 +2287,248 @@
 
 * Space Complexity
     * DFS recursion stack can go `M*N` deep when the whole matrix is filled with `1`s. Hence, the space complexity will be `O(M*N)`, where `M` is the number of rows and `N` is the number of columns of the input matrix.
+
+### Island Perimeter (easy)
+
+* You are given a `2D matrix` containing only `1`s (land) and `0`s (water).
+
+* An island is a connected set of `1`s (land) and is surrounded by `either an edge or 0`s (water). Each cell is considered connected to other cells horizontally or vertically (not diagonally).
+
+* There are `no lakes` on the island, so the water inside the island is not connected to the water around it. A cell is a square with a side length of `1`. 
+
+* The given matrix has only one island, write a function to find the perimeter of that island.
+
+* Examples
+    * ```
+        Input: new int[][]{
+            {1, 1, 0, 0, 0},
+            {0, 1, 0, 0, 0},
+            {0, 1, 0, 0, 0},
+            {0, 1, 1, 0, 0},
+            {0, 0, 0, 0, 0}
+        }
+        Output: 14 (The boundary of the island constitute 14 sides.)
+        ```
+    * ```
+        Input: new int[][]{
+            {0, 0, 0, 0},
+            {0, 1, 0, 0},
+            {0, 1, 0, 0},
+            {0, 1, 1, 0},
+            {0, 1, 0, 0}
+        }
+        Output: 12 (The boundary of the island constitute 12 sides.)
+        ```
+
+* Solution
+
+    * The question follows the Island pattern and is quite similar to Number of Islands problem.
+
+    * We will traverse the matrix linearly to find the island. We can use the `Depth First Search (DFS)` or `Breadth First Search (BFS)` to traverse the island i.e., to find all of its connected land cells.
+
+    * How do we calculate the boundary if the island?
+
+    * Each cell has four sides. Each side of an island cell can be shared with another cell; we can include the side in the island perimeter only if the other cell is a water. 
+
+    * If a cell side is on boundary, we should include that side in the perimeter.
+
+    * Following piece of code will cover these two conditions:
+
+    * ```java
+        if (x < 0 || x >= matrix.length || y < 0 || y >= matrix[0].length)
+            return 1; // returning 1, since this a boundary cell initiated this DFS call
+        if (matrix[x][y] == 0)
+            return 1; // returning 1, because of the shared side b/w a water and a land cell
+        ```
+
+* Code (DFS)
+    * `solution5.java`
+    * ```java
+        import java.util.*;
+
+        class IslandPerimeterDFS {
+            public static int findIslandPerimeter(int[][] matrix) {
+                int rows = matrix.length;
+                int cols = matrix[0].length;
+                boolean[][] visited = new boolean[rows][cols];
+
+                for (int i = 0; i < rows; i++) {
+                    for (int j = 0; j < cols; j++) {
+                        if (matrix[i][j] == 1 && !visited[i][j]) // only if the cell is a land and not visited
+                            return islandPerimeterDFS(matrix, visited, i, j);
+                    }
+                }
+                return 0;
+            }
+
+            private static int islandPerimeterDFS(int[][] matrix, boolean[][] visited, int x, int y) {
+                if (x < 0 || x >= matrix.length || y < 0 || y >= matrix[0].length)
+                    return 1; // returning 1, since this a boundary cell initiated this DFS call
+                if (matrix[x][y] == 0)
+                    return 1; // returning 1, because of the shared side b/w a water and a land cell
+
+                if (visited[x][y])
+                    return 0; // we have already taken care of this cell
+
+                visited[x][y] = true; // mark the cell visited
+
+                int edgeCount = 0;
+                // recursively visit all neighboring cells (horizontally & vertically)
+                edgeCount += islandPerimeterDFS(matrix, visited, x + 1, y); // lower cell
+                edgeCount += islandPerimeterDFS(matrix, visited, x - 1, y); // upper cell
+                edgeCount += islandPerimeterDFS(matrix, visited, x, y + 1); // right cell
+                edgeCount += islandPerimeterDFS(matrix, visited, x, y - 1); // left cell
+
+                return edgeCount;
+            }
+
+            public static void main(String[] args) {
+                System.out.println(IslandPerimeterDFS.findIslandPerimeter(
+                    new int[][] {
+                        { 1, 1, 0, 0, 0 },
+                        { 0, 1, 0, 0, 0 },
+                        { 0, 1, 0, 0, 0 },
+                        { 0, 1, 1, 0, 0 },
+                        { 0, 0, 0, 0, 0 }
+                    }));
+
+                System.out.println(IslandPerimeterDFS.findIslandPerimeter(
+                    new int[][] {
+                        { 0, 0, 0, 0 },
+                        { 0, 1, 0, 0 },
+                        { 0, 1, 0, 0 },
+                        { 0, 1, 1, 0 },
+                        { 0, 1, 0, 0 }
+                    }));
+            }
+        }
+        ```
+
+* Time Complexity
+    * Time complexity of the above algorithm will be `O(M*N)`, where `M` is the number of rows and `N` is the number of columns of the input matrix. This is due to the fact that we have to traverse the whole matrix to find the island.
+
+* Space Complexity
+    * DFS recursion `stack` can go `M*N` deep when the whole matrix is filled with `1`s. Hence, the space complexity will be `O(M*N)`, where `M` is the number of rows and `N` is the number of columns of the input matrix.
+
+### Number of Distinct Islands (medium)
+
+* You are given a 2D matrix containing only `1`s (land) and `0`s (water).
+
+* An island is a connected set of `1`s (land) and is surrounded by either an edge or `0`s (water). Each cell is considered connected to other cells horizontally or vertically (not diagonally).
+
+* Two islands are considered the same if and only if they can be `translated` (not rotated or reflected) to equal each other. 
+
+* Write a function to find the number of distinct islands in the given matrix.
+
+* Examples
+    * ```
+        Input: new int[][]{
+            {1, 1, 0, 1, 1},
+            {1, 1, 0, 1, 1},
+            {0, 0, 0, 0, 0},
+            {0, 1, 1, 0, 1},
+            {0, 1, 1, 0, 1}
+        }
+        Output: 2
+        ```
+    * ```
+        Input: new int[][]{
+            {1, 1, 0, 1},
+            {0, 1, 1, 0},
+            {0, 0, 0, 0},
+            {1, 1, 0, 0},
+            {0, 1, 1, 0}
+        }
+        Output: 2
+        ```
+
+* Solution
+
+    * The question follows the Island pattern and is quite similar to Number of Islands problem.
+
+    * We will traverse the matrix linearly to find islands. We can use the `Depth First Search (DFS)` or `Breadth First Search (BFS)` to traverse an island i.e., to find all of its connected land cells.
+
+    * How do we decide if two islands are same?
+
+    * If two islands are same, their traversal path should be same too. This means, if we perform a `DFS or BFS` on two equal islands starting from **their top-left cell, the traversal pattern should be exactly same for both the islands.**
+
+    * We can clearly see that the two equal islands have same traversal pattern. 
+
+    * We can utilize this fact to develop an algorithm.
+
+    * While traversing an island, we can construct a string that maps the traversal path of the island. For example, here is the `DFS` traversal of the two same islands mentioned in `Example-2 ( 'R' for right move, 'D' for down move, 'O' for origin denoting the start): ORDR`
+
+    * We can start inserting these traversal strings of each island in a `HashSet`. This will ensure that we will not have any duplicate traversal string in the `HashSet`, thus giving us distinct islands. When we finish traversing the matrix, the `HashSet` will contain the distinct traversal path of all islands. Hence, the total number of elements in the `HashSet` will be equal to distinct number of islands.
+
+* Code (DFS)
+
+    * ```java
+        import java.util.*;
+
+        class DistinctIslandsDFS {
+            public static int findDistinctIslandsDFS(int[][] matrix) {
+                int rows = matrix.length;
+                int cols = matrix[0].length;
+                boolean[][] visited = new boolean[rows][cols];
+                Set<String> islandsSet = new HashSet<>();
+
+                for (int i = 0; i < rows; i++) {
+                    for (int j = 0; j < cols; j++) {
+                        if (matrix[i][j] == 1 && !visited[i][j]) { // only if the cell is a land and not visited
+                            StringBuilder islandTraversal = new StringBuilder();
+                            traverseIslandDFS(matrix, visited, i, j, islandTraversal, "O"); // origin
+                            islandsSet.add(islandTraversal.toString());
+                        }
+                    }
+                }
+                return islandsSet.size();
+            }
+
+            private static void traverseIslandDFS(int[][] matrix, boolean[][] visited, int x, int y,
+                StringBuilder islandTraversal, String direction) {
+                if (x < 0 || x >= matrix.length || y < 0 || y >= matrix[0].length)
+                    return; // return if it is not a valid cell
+                if (matrix[x][y] == 0 || visited[x][y])
+                    return; // return if it is a water cell or is visited
+
+                visited[x][y] = true; // mark the cell visited
+
+                islandTraversal.append(direction);
+                // recursively visit all neighboring cells (horizontally & vertically)
+                traverseIslandDFS(matrix, visited, x + 1, y, islandTraversal, "D"); // down
+                traverseIslandDFS(matrix, visited, x - 1, y, islandTraversal, "U"); // up
+                traverseIslandDFS(matrix, visited, x, y + 1, islandTraversal, "R"); // right
+                traverseIslandDFS(matrix, visited, x, y - 1, islandTraversal, "L"); // left
+
+                islandTraversal.append("B"); // back
+            }
+
+            public static void main(String[] args) {
+                System.out.println(DistinctIslandsDFS.findDistinctIslandsDFS(
+                    new int[][] {
+                        { 1, 1, 0, 1, 1 },
+                        { 1, 1, 0, 1, 1 },
+                        { 0, 0, 0, 0, 0 },
+                        { 0, 1, 1, 0, 1 },
+                        { 0, 1, 1, 0, 1 }
+                    }));
+
+                System.out.println(DistinctIslandsDFS.findDistinctIslandsDFS(
+                    new int[][] {
+                        { 1, 1, 0, 1 },
+                        { 0, 1, 1, 0 },
+                        { 0, 0, 0, 0 },
+                        { 1, 1, 0, 0 },
+                        { 0, 1, 1, 0 }
+                    }));
+            }
+        }
+        ```
+
+* Time Complexity
+
+    * Time complexity of the above algorithm will be `O(M*N)`, where `M` is the number of rows and `N` is the number of columns of the input matrix. This is due to the fact that we have to traverse the whole matrix to find islands.
+
+* Space Complexity
+
+    * `DFS` recursion stack can go `M*N` deep when the whole matrix is filled with `1`s. Hence, the space complexity will be `O(M*N)`, where `M` is the number of rows and `N` is the number of columns of the input matrix.
