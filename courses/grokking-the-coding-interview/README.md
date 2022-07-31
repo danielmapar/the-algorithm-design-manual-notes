@@ -1581,6 +1581,88 @@
 * Space Complexity
     * The algorithm runs in constant space `O(1)`.
 
+### Problem Challenge 1: Quadruple Sum to Target (medium)
+
+* Given an array of unsorted numbers and a target number, find all unique quadruplets in it, whose sum is equal to the target number.
+
+* Examples
+    * ```
+        Input: [4, 1, 2, -1, 1, -3], target=1
+        Output: [-3, -1, 1, 4], [-3, 1, 1, 2]
+        Explanation: Both the quadruplets add up to the target.
+        ```
+    * ```
+        Input: [2, 0, -1, 1, -2, 2], target=2
+        Output: [-2, 0, 2, 2], [-1, 0, 1, 2]
+        Explanation: Both the quadruplets add up to the target.
+        ```
+
+* Solution
+
+    * This problem follows the `Two Pointers` pattern and shares similarities with `Triplet Sum to Zero`.
+
+    * We can follow a similar approach to iterate through the array, taking one number at a time. At every step during the iteration, we will search for the quadruplets similar to `Triplet Sum to Zero` whose sum is equal to the given target.
+
+* Code
+    * `solution10.java`
+    * ```java
+        import java.util.*;
+
+        class QuadrupleSumToTarget {
+
+            public static List<List<Integer>> searchQuadruplets(int[] arr, int target) {
+                Arrays.sort(arr);
+                List<List<Integer>> quadruplets = new ArrayList<>();
+                for (int i = 0; i < arr.length - 3; i++) {
+                    // skip same element to avoid duplicate quadruplets
+                    if (i > 0 && arr[i] == arr[i - 1]) 
+                        continue;
+                    for (int j = i + 1; j < arr.length - 2; j++) {
+                        // skip same element to avoid duplicate quadruplets
+                        if (j > i + 1 && arr[j] == arr[j - 1]) 
+                            continue;
+                        searchPairs(arr, target, i, j, quadruplets);
+                    }
+                }
+                return quadruplets;
+            }
+
+            private static void searchPairs(int[] arr, int targetSum, int first, 
+                                            int second, List<List<Integer>> quadruplets) {
+                int left = second + 1;
+                int right = arr.length - 1;
+                while (left < right) {
+                    int sum = arr[first] + arr[second] + arr[left] + arr[right];
+                    if (sum == targetSum) { // found the quadruplet
+                        quadruplets.add(Arrays.asList(arr[first], arr[second], arr[left], arr[right]));
+                        left++;
+                        right--;
+                        while (left < right && arr[left] == arr[left - 1])
+                            left++; // skip same element to avoid duplicate quadruplets
+                        while (left < right && arr[right] == arr[right + 1])
+                            right--; // skip same element to avoid duplicate quadruplets
+                    } else if (sum < targetSum)
+                        left++; // we need a pair with a bigger sum
+                    else
+                        right--; // we need a pair with a smaller sum
+                }
+            }
+
+            public static void main(String[] args) {
+                System.out.println(
+                    QuadrupleSumToTarget.searchQuadruplets(new int[] { 4, 1, 2, -1, 1, -3 }, 1));
+                System.out.println(
+                    QuadrupleSumToTarget.searchQuadruplets(new int[] { 2, 0, -1, 1, -2, 2 }, 2));
+            }
+        }
+        ```
+
+* Time Complexity
+    * Sorting the array will take `O(N*logN)`. Overall `searchQuadruplets()` will take `O(N * logN + N^3)`, which is asymptotically equivalent to `O(N^3)`.
+
+* Space Complexity
+    * The space complexity of the above algorithm will be `O(N)` which is required for sorting.
+
 ## Pattern: Islands (Matrix Traversal)
 
 ### Number of Islands (easy)
@@ -2532,3 +2614,140 @@
 * Space Complexity
 
     * `DFS` recursion stack can go `M*N` deep when the whole matrix is filled with `1`s. Hence, the space complexity will be `O(M*N)`, where `M` is the number of rows and `N` is the number of columns of the input matrix.
+
+### Cycle in a Matrix (medium)
+
+* You are given a `2D matrix` containing different characters, you need to find if there exists any cycle consisting of the same character in the matrix.
+
+* A `cycle` is a path in the matrix that `starts and ends at the same cell and has four or more cells`. From a given cell, you can move to one of the cells adjacent to it - in one of the four directions (up, down, left, or right), if it has the same character value of the current cell. 
+
+* Write a function to find if the matrix has a cycle.
+
+* Examples
+    * ```
+        Input: new char[][]{
+            {'a', 'a', 'a', 'a' },
+            {'b', 'a', 'c', 'a' },
+            {'b', 'a', 'c', 'a' },
+            {'b', 'a', 'a', 'a' },
+        }
+        Output: true
+        ```
+    * ```
+        Input: new char[][]{
+            {'a', 'a', 'a', 'a' },
+            {'a', 'b', 'b', 'a' },
+            {'a', 'b', 'a', 'a' },
+            {'a', 'a', 'a', 'c' },
+        }
+        Output: true
+        ```
+    * ```
+        Input: new char[][]{
+            {'a', 'b', 'e', 'b' },
+            {'b', 'b', 'c', 'b' },
+            {'b', 'c', 'c', 'd' },
+            {'d', 'c', 'd', 'd' },
+        }
+        Output: false
+        ```
+    * ```
+        Input: new char[][]{
+            {'b', 'b', 'e', 'b' },
+            {'b', 'b', 'c', 'b' },
+            {'b', 'c', 'c', 'd' },
+            {'d', 'c', 'd', 'd' },
+        }
+        Output: true
+        ```
+
+* Solution
+
+    * The question follows the Island pattern and is quite similar to Number of Islands problem.
+
+    * We will `traverse the matrix linearly` to find any cycle. Each cycle is like an island having cells containing same values. Hence, we can use the `Depth First Search (DFS) or Breadth First Search (BFS)` to traverse a cycle i.e., to find all of its connected cells with the same value.
+
+    * Our approach for traversing the matrix will be similar to the one we used when searching for islands. We will keep another matrix to remember the cells that we have visited. From any given cell, we can perform `DFS` to traverse all the neighboring cells having the same character value. 
+
+    * Whenever we reach a cell that have already been visited, we can conclude that we have found a cycle. This also means that we need to be careful to `not start traversing the parent cell and wrongly finding a cycle`. That is, while traversing, when initiating `DFS` recursive calls to all the neighboring cell, we should not start a `DFS call to the pervious cell`.
+
+* Code (DFS)
+    * `solution7.java`
+    * ```java
+        import java.util.*;
+
+        class IslandCycleDFS {
+            public static boolean hasCycle(char[][] matrix) {
+                int rows = matrix.length;
+                int cols = matrix[0].length;
+                boolean[][] visited = new boolean[rows][cols];
+
+                for (int i = 0; i < rows; i++) {
+                    for (int j = 0; j < cols; j++) {
+                        if (!visited[i][j]) // only if the cell is not visited
+                        if (containsCycleDFS(matrix, visited, matrix[i][j], i, j, -1, -1))
+                            return true;
+                    }
+                }
+                return false;
+            }
+
+            private static boolean containsCycleDFS(char[][] matrix, boolean[][] visited,
+                char startChar, int x, int y, int prevX, int prevY) {
+                if (x < 0 || x >= matrix.length || y < 0 || y >= matrix[0].length)
+                    return false; // not a valid cell
+                if (matrix[x][y] != startChar)
+                    return false; // different character which means a different island
+
+                if (visited[x][y])
+                    return true; // found a cycle, as we are visiting an already visited valid cell
+
+                visited[x][y] = true; // mark the cell visited
+
+                // recursively visit all neighboring cells (horizontally & vertically)
+                if (x + 1 != prevX && containsCycleDFS(matrix, visited, startChar, x + 1, y, x, y)) // down
+                    return true;
+                if (x - 1 != prevX && containsCycleDFS(matrix, visited, startChar, x - 1, y, x, y)) // up
+                    return true;
+                if (y + 1 != prevY && containsCycleDFS(matrix, visited, startChar, x, y + 1, x, y)) // right
+                    return true;
+                if (y - 1 != prevY && containsCycleDFS(matrix, visited, startChar, x, y - 1, x, y)) // left
+                    return true;
+
+                return false;
+            }
+
+            public static void main(String[] args) {
+                System.out.println(IslandCycleDFS.hasCycle(
+                    new char[][] {
+                        { 'a', 'a', 'a', 'a' },
+                        { 'b', 'a', 'c', 'a' },
+                        { 'b', 'a', 'c', 'a' },
+                        { 'b', 'a', 'a', 'a' }
+                    }));
+
+                System.out.println(IslandCycleDFS.hasCycle(
+                    new char[][] {
+                        { 'a', 'a', 'a', 'a' },
+                        { 'a', 'b', 'b', 'a' },
+                        { 'a', 'b', 'a', 'a' },
+                        { 'a', 'a', 'a', 'c' }
+                    }));
+
+                System.out.println(IslandCycleDFS.hasCycle(
+                    new char[][] {
+                        { 'a', 'b', 'e', 'b' },
+                        { 'b', 'b', 'b', 'b' },
+                        { 'b', 'c', 'c', 'd' },
+                        { 'c', 'c', 'd', 'd' }
+                    }));
+            }
+        }
+        ```
+
+* Time Complexity
+    * Time complexity of the above algorithm will be `O(M*N)`, where `M` is the number of rows and `N` is the number of columns of the input matrix. This is due to the fact that we have to traverse the whole matrix to find cycles.
+
+* Space Complexity
+    * DFS recursion stack can go `M*N` deep when the whole matrix is filled with the same character. Hence, the space complexity will be `O(M*N)`, where `M` is the number of rows and `N` is the number of columns of the input matrix.
+
