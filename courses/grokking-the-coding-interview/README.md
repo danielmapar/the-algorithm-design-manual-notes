@@ -2938,3 +2938,255 @@
 * Space Complexity
     * DFS recursion stack can go `M*N` deep when the whole matrix is filled with the same character. Hence, the space complexity will be `O(M*N)`, where `M` is the number of rows and `N` is the number of columns of the input matrix.
 
+## Pattern: Fast and Slow Pointers
+
+### Introduction
+
+* The Fast & Slow pointer approach, also known as the `Hare & Tortoise algorithm`, is a pointer algorithm that uses two pointers which move through the array (or sequence/LinkedList) at different speeds. This approach is quite useful when dealing with `cyclic LinkedLists or arrays`.
+
+* By moving at different speeds (say, in a `cyclic LinkedList`), the algorithm proves that the `two pointers` are `bound to meet`. **The fast pointer should catch the slow pointer once both the pointers are in a cyclic loop**.
+
+* One of the famous problems solved using this technique was Finding a `cycle in a LinkedList`. Let’s jump onto this problem to understand the `Fast & Slow pattern`.
+
+### LinkedList Cycle (easy)
+
+* Given the head of a `Singly LinkedList`, write a function to determine if the `LinkedList has a cycle` in it or not.
+
+* ![linked_list_cycle](./images/linked_list_cycle.png) 
+
+* Solution
+
+    * Imagine two racers running in a circular racing track. If one racer is faster than the other, the faster racer is bound to catch up and cross the slower racer from behind. We can use this fact to devise an algorithm to determine if a `LinkedList has a cycle` in it or not.
+
+    * Imagine we have a `slow and a fast pointer to traverse the LinkedList`. In each iteration, the slow pointer moves one step and the fast pointer moves two steps. This gives us two conclusions:
+
+        * If the `LinkedList` doesn’t have a cycle in it, the fast pointer will reach the end of the `LinkedList` before the slow pointer to reveal that there is no cycle in the LinkedList.
+
+        * The slow pointer will never be able to catch up to the fast pointer if there is no cycle in the LinkedList.
+    
+    * If the `LinkedList` has a cycle, the fast pointer enters the cycle first, followed by the slow pointer. After this, both pointers will keep moving in the cycle infinitely. If at any stage both of these pointers meet, we can conclude that the `LinkedList` has a cycle in it. Let’s analyze if it is possible for the two pointers to meet. When the fast pointer is approaching the slow pointer from behind we have two possibilities:
+        * The fast pointer is one step behind the slow pointer.
+        * The fast pointer is two steps behind the slow pointer.
+    
+    * All other distances between the fast and slow pointers will reduce to one of these two possibilities. Let’s analyze these scenarios, considering the fast pointer always moves first:
+
+        * `If the fast pointer is one step behind the slow pointer`: The fast pointer moves two steps and the slow pointer moves one step, and they both meet.
+        * `If the fast pointer is two steps behind the slow pointer`: The fast pointer moves two steps and the slow pointer moves one step. After the moves, the fast pointer will be one step behind the slow pointer, which reduces this scenario to the first scenario. This means that the two pointers will meet in the next iteration.
+    
+    * This concludes that the two pointers will definitely meet if the LinkedList has a cycle. A similar analysis can be done where the slow pointer moves first. Here is a visual representation of the above discussion:
+
+    * ![linked_list_cycle](./images/linked_list_cycle2.png) 
+
+* Solution
+    * `solution1.java`
+    * ```java
+        class ListNode {
+            int value = 0;
+            ListNode next;
+
+            ListNode(int value) {
+                this.value = value;
+            }
+        }
+
+        class LinkedListCycle {
+
+            public static boolean hasCycle(ListNode head) {
+                ListNode slow = head;
+                ListNode fast = head;
+                while (fast != null && fast.next != null) {
+                    fast = fast.next.next;
+                    slow = slow.next;
+                    if (slow == fast)
+                        return true; // found the cycle
+                }
+                    return false;
+            }
+
+            public static void main(String[] args) {
+                ListNode head = new ListNode(1);
+                head.next = new ListNode(2);
+                head.next.next = new ListNode(3);
+                head.next.next.next = new ListNode(4);
+                head.next.next.next.next = new ListNode(5);
+                head.next.next.next.next.next = new ListNode(6);
+                System.out.println("LinkedList has cycle: " + LinkedListCycle.hasCycle(head));
+
+                head.next.next.next.next.next.next = head.next.next;
+                System.out.println("LinkedList has cycle: " + LinkedListCycle.hasCycle(head));
+
+                head.next.next.next.next.next.next = head.next.next.next;
+                System.out.println("LinkedList has cycle: " + LinkedListCycle.hasCycle(head));
+            }
+        }
+        ```
+
+* Time Complexity
+    * As we have concluded above, once the slow pointer enters the cycle, the fast pointer will meet the slow pointer in the same loop. Therefore, the time complexity of our algorithm will be `O(N)` where `N` is the total number of nodes in the `LinkedList`.
+
+* Space Complexity
+    * The algorithm runs in constant space `O(1)`
+
+### Similar Problems
+
+* Problem 1: Given the head of a LinkedList with a cycle, find the length of the cycle.
+
+* Solution
+    * ```java
+        class ListNode {
+            int value = 0;
+            ListNode next;
+
+            ListNode(int value) {
+                this.value = value;
+            }
+        }
+
+        class LinkedListCycleLength {
+
+            public static int findCycleLength(ListNode head) {
+                ListNode slow = head;
+                ListNode fast = head;
+                while (fast != null && fast.next != null) {
+                    fast = fast.next.next;
+                    slow = slow.next;
+                    if (slow == fast) // found the cycle
+                        return calculateLength(slow);
+                }
+                return 0;
+            }
+
+            private static int calculateLength(ListNode slow) {
+                ListNode current = slow;
+                int cycleLength = 0;
+                do {
+                    current = current.next;
+                    cycleLength++;
+                } while (current != slow);
+                return cycleLength;
+            }
+
+            public static void main(String[] args) {
+                ListNode head = new ListNode(1);
+                head.next = new ListNode(2);
+                head.next.next = new ListNode(3);
+                head.next.next.next = new ListNode(4);
+                head.next.next.next.next = new ListNode(5);
+                head.next.next.next.next.next = new ListNode(6);
+                head.next.next.next.next.next.next = head.next.next;
+                System.out.println("LinkedList cycle length: " 
+                                    + LinkedListCycleLength.findCycleLength(head));
+
+                head.next.next.next.next.next.next = head.next.next.next;
+                System.out.println("LinkedList cycle length: " 
+                                    + LinkedListCycleLength.findCycleLength(head));
+            }
+        }
+        ```
+
+* Time and Space Complexity: The above algorithm runs in `O(N)` time complexity and `O(1)` space complexity.
+
+### Start of LinkedList Cycle (medium)
+
+* Given the head of a `Singly LinkedList` that contains a cycle, write a function to find the `starting node of the cycle`.
+
+* Solution
+    * If we know the length of the `LinkedList cycle`, we can find the start of the cycle through the following steps:
+
+        * Take two pointers. Let’s call them `pointer1` and `pointer2`.
+        * Initialize both pointers to point to the start of the `LinkedList`.
+        * We can find the length of the `LinkedList cycle` using the approach discussed in `LinkedList Cycle`. Let’s assume that the length of the cycle is `‘K’ nodes`.
+        * Move `pointer2` ahead by `‘K’ nodes`.
+        * Now, keep incrementing `pointer1` and `pointer2` until they both meet.
+        * As `pointer2` is `K` nodes ahead of `pointer1`, which means, `pointer2` must have completed one loop in the cycle when both pointers meet. Their meeting point will be the start of the cycle.
+
+    * ![linked_list_cycle3](./images/linked_list_cycle3.png);
+
+    * We can use the algorithm discussed in `LinkedList Cycle` to find the length of the cycle and then follow the above-mentioned steps to find the start of the cycle.
+    
+    * `solution2.java`
+    * ```java
+        class ListNode {
+            int value = 0;
+            ListNode next;
+
+            ListNode(int value) {
+                this.value = value;
+            }
+        }
+
+        class LinkedListCycleStart {
+
+            public static ListNode findCycleStart(ListNode head) {
+                int cycleLength = 0;
+                // find the LinkedList cycle
+                ListNode slow = head;
+                ListNode fast = head;
+                while (fast != null && fast.next != null) {
+                    fast = fast.next.next;
+                    slow = slow.next;
+                    if (slow == fast) { // found the cycle
+                        cycleLength = calculateCycleLength(slow);
+                        break;
+                    }
+                }
+
+                return findStart(head, cycleLength);
+            }
+
+            private static int calculateCycleLength(ListNode slow) {
+                ListNode current = slow;
+                int cycleLength = 0;
+                do {
+                    current = current.next;
+                    cycleLength++;
+                } while (current != slow);
+                
+                return cycleLength;
+            }
+
+            private static ListNode findStart(ListNode head, int cycleLength) {
+                ListNode pointer1 = head, pointer2 = head;
+                // move pointer2 ahead 'cycleLength' nodes
+                while (cycleLength > 0) {
+                    pointer2 = pointer2.next;
+                    cycleLength--;
+                }
+
+                // increment both pointers until they meet at the start of the cycle
+                while (pointer1 != pointer2) {
+                    pointer1 = pointer1.next;
+                    pointer2 = pointer2.next;
+                }
+
+                return pointer1;
+            }
+
+            public static void main(String[] args) {
+                ListNode head = new ListNode(1);
+                head.next = new ListNode(2);
+                head.next.next = new ListNode(3);
+                head.next.next.next = new ListNode(4);
+                head.next.next.next.next = new ListNode(5);
+                head.next.next.next.next.next = new ListNode(6);
+
+                head.next.next.next.next.next.next = head.next.next;
+                System.out.println("LinkedList cycle start: " + 
+                                        LinkedListCycleStart.findCycleStart(head).value);
+
+                head.next.next.next.next.next.next = head.next.next.next;
+                System.out.println("LinkedList cycle start: " + 
+                                        LinkedListCycleStart.findCycleStart(head).value);
+
+                head.next.next.next.next.next.next = head;
+                System.out.println("LinkedList cycle start: " + 
+                                        LinkedListCycleStart.findCycleStart(head).value);
+            }
+        }
+        ```
+
+* Time Complexity
+    * As we know, finding the cycle in a `LinkedList` with `N` nodes and also finding the length of the cycle requires `O(N)`. Also, as we saw in the above algorithm, we will need `O(N)` to find the start of the cycle. Therefore, the overall time complexity of our algorithm will be `O(N)`.
+
+* Space Complexity
+    * The algorithm runs in constant space `O(1)`.
