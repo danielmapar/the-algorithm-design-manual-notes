@@ -3190,3 +3190,163 @@
 
 * Space Complexity
     * The algorithm runs in constant space `O(1)`.
+
+
+### Happy Number (medium)
+
+* Any number will be called a `happy number` if, after repeatedly replacing it with a number equal to the `sum of the square of all of its digits`, leads us to number `1`. All other (not-happy) numbers will never reach `1`. Instead, they will be stuck in a cycle of numbers which does not include `1`.
+
+* n = 123
+    * 1^2 + 2^2 + 3^2 = 1 + 4 + 9 = 14 (not a happy number)
+* n = 1000
+    * 1^2 + many 0^2 = 1 (happy number)
+
+* Examples
+    * ```
+        Input: 23   
+        Output: true (23 is a happy number)  
+        Explanations: Here are the steps to find out that 23 is a happy number:
+        ```
+    * ![slow_fast_example](./images/slow_fast_example1.png)
+    * ```
+        Input: 12   
+        Output: false (12 is not a happy number)  
+        Explanations: Here are the steps to find out that 12 is not a happy number:
+        ```
+    * ![slow_fast_example](./images/slow_fast_example2.png) 
+
+    * Step ‘13’ leads us back to step ‘5’ as the number becomes equal to ‘89’, this means that we can never reach ‘1’, therefore, ‘12’ is not a happy number.
+
+* Solution
+    * The process, defined above, to find out if a number is a happy number or not, always ends in a `cycle`. If the number is a happy number, the process will be stuck in a cycle on number `1`, and if the number is not a happy number then the process will be stuck in a cycle with a set of numbers. As we saw in Example-2 while determining if `12` is a happy number or not, our process will get stuck in a cycle with the following numbers: `89 -> 145 -> 42 -> 20 -> 4 -> 16 -> 37 -> 58 -> 89`
+
+    * We saw in the `LinkedList Cycle` problem that we can use the `Fast & Slow pointers` method to find a cycle among a set of elements. As we have described above, each number will definitely have a cycle. Therefore, we will use the same `fast & slow pointer` strategy to find the cycle and once the cycle is found, we will see if the cycle is stuck on number `1` to find out if the number is happy or not.
+
+* Code
+    * `solution3.java`
+    * ```java
+        class HappyNumber {
+
+            public static boolean find(int num) {
+                int slow = num, fast = num;
+                do {
+                    slow = findSquareSum(slow); // move one step
+                    fast = findSquareSum(findSquareSum(fast)); // move two steps
+                } while (slow != fast); // found the cycle
+
+                return slow == 1; // see if the cycle is stuck on the number '1'
+            }
+
+            private static int findSquareSum(int num) {
+                int sum = 0, digit;
+                while (num > 0) {
+                    digit = num % 10;
+                    sum += digit * digit;
+                    num /= 10;
+                }
+                return sum;
+            }
+
+            public static void main(String[] args) {
+                System.out.println(HappyNumber.find(23));
+                System.out.println(HappyNumber.find(12));
+            }
+        }
+        ```
+
+* Time Complexity
+
+    * The time complexity of the algorithm is difficult to determine. However we know the fact that all unhappy numbers eventually get stuck in the cycle: 4 -> 16 -> 37 -> 58 -> 89 -> 145 -> 42 -> 20 -> 4
+
+    * This sequence behavior tells us two things:
+
+        * If the number `N` is less than or equal to `1000`, then we reach the cycle or `1` in at most `1001` steps.
+        * For `N > 1000`, suppose the number has `M` digits and the next number is `N1`. From the above [Wikipedia link](https://en.wikipedia.org/wiki/Happy_number#Specific_%7F'%22%60UNIQ--postMath-00000027-QINU%60%22'%7F-happy_numbers), we know that the sum of the squares of the digits of `N` is at most `9^2*M`, or `81M` (this will happen when all digits of `N` are `9`).
+    
+    * This means:
+        * `N1` < `81M`
+        * As we know `M = log(N+1)`
+        * Therefore: `N1` < `81 * log(N+1)` => `N1` => `O(logN)`
+    
+    * This concludes that the above algorithm will have a time complexity of `O(logN)`.
+
+* Space Complexity
+
+    * The algorithm runs in constant space `O(1)`.
+
+### Middle of the LinkedList (easy)
+
+* Given the head of a `Singly LinkedList`, write a method to return the middle node of the `LinkedList`.
+
+* If the total number of nodes in the `LinkedList` is even, return the second `middle` node.
+
+* Examples
+
+    * ```
+        Input: 1 -> 2 -> 3 -> 4 -> 5 -> null
+        Output: 3
+        ```
+
+    * ```
+        Input: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> null
+        Output: 4
+        ```
+
+    * ```
+        Input: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> null
+        Output: 4
+        ```
+
+* Solution
+
+    * One brute force strategy could be to first count the number of nodes in the `LinkedList` and then find the `middle node` in the second iteration. Can we do this in one iteration?
+
+    * We can use the `Fast & Slow` pointers method such that the fast pointer is always twice the nodes ahead of the slow pointer. This way, when the fast pointer reaches the end of the `LinkedList`, **the slow pointer will be pointing at the middle node.**
+
+* Code
+    * `solution4.java`
+    * ```java 
+        class ListNode {
+            int value = 0;
+            ListNode next;
+
+            ListNode(int value) {
+                this.value = value;
+            }
+        }
+
+        class MiddleOfLinkedList {
+
+            public static ListNode findMiddle(ListNode head) {
+                ListNode slow = head;
+                ListNode fast = head;
+                while (fast != null && fast.next != null) {
+                    slow = slow.next;
+                    fast = fast.next.next;
+                }
+                return slow;
+            }
+
+            public static void main(String[] args) {
+                ListNode head = new ListNode(1);
+                head.next = new ListNode(2);
+                head.next.next = new ListNode(3);
+                head.next.next.next = new ListNode(4);
+                head.next.next.next.next = new ListNode(5);
+                System.out.println("Middle Node: " + MiddleOfLinkedList.findMiddle(head).value);
+
+                head.next.next.next.next.next = new ListNode(6);
+                System.out.println("Middle Node: " + MiddleOfLinkedList.findMiddle(head).value);
+
+                head.next.next.next.next.next.next = new ListNode(7);
+                System.out.println("Middle Node: " + MiddleOfLinkedList.findMiddle(head).value);
+            }
+        }
+        ```
+
+* Time Complexity
+    * The above algorithm will have a time complexity of `O(N)` where `N` is the number of nodes in the `LinkedList`.
+
+* Space Complexity
+    * The algorithm runs in constant space `O(1)`
+
