@@ -3350,3 +3350,207 @@
 * Space Complexity
     * The algorithm runs in constant space `O(1)`
 
+### Problem Challenge 1: Palindrome LinkedList (medium)
+
+* Given the head of a `Singly LinkedList`, write a method to check if the `LinkedList` is a palindrome or not.
+
+* Your algorithm should use `constant space` and the input `LinkedList` should be in the original form once the algorithm is finished. The algorithm should have `O(N)` time complexity where `N` is the number of nodes in the `LinkedList`.
+
+* Examples
+
+    * ```
+        Input: 2 -> 4 -> 6 -> 4 -> 2 -> null
+        Output: true
+        ```
+
+    * ```
+        Input: 2 -> 4 -> 6 -> 4 -> 2 -> 2 -> null
+        Output: false
+        ```
+
+* Solution
+    * As we know, a palindrome `LinkedList` will have nodes values that read the same backward or forward. This means that if we divide the LinkedList into two halves, the node values of the first half in the forward direction should be similar to the node values of the second half in the backward direction. As we have been given a Singly LinkedList, we can’t move in the backward direction. To handle this, we will perform the following steps:
+        * We can use the Fast & Slow pointers method similar to Middle of the LinkedList to find the middle node of the LinkedList.
+        * Once we have the middle of the LinkedList, we will reverse the second half.
+        * Then, we will compare the first half with the reversed second half to see if the LinkedList represents a palindrome.
+        * Finally, we will reverse the second half of the LinkedList again to revert and bring the LinkedList back to its original form.
+
+* Code
+    * `solution5.java`
+    * ```java
+        class ListNode {
+            int value = 0;
+            ListNode next;
+
+            ListNode(int value) {
+                this.value = value;
+            }
+        }
+
+        class PalindromicLinkedList {
+
+            public static boolean isPalindrome(ListNode head) {
+                if (head == null || head.next == null)
+                return true;
+
+                // find middle of the LinkedList
+                ListNode slow = head;
+                ListNode fast = head;
+                while (fast != null && fast.next != null) {
+                    slow = slow.next;
+                    fast = fast.next.next;
+                }
+
+                ListNode headSecondHalf = reverse(slow); // reverse the second half
+                // store the head of reversed part to revert back later
+                ListNode copyHeadSecondHalf = headSecondHalf; 
+
+                // compare the first and the second half
+                while (head != null && headSecondHalf != null) {
+                    if (head.value != headSecondHalf.value) {
+                        break; // not a palindrome
+                    }
+                    head = head.next;
+                    headSecondHalf = headSecondHalf.next;
+                }
+
+                reverse(copyHeadSecondHalf); // revert the reverse of the second half
+                if (head == null || headSecondHalf == null) // if both halves match
+                    return true;
+                return false;
+            }
+
+            private static ListNode reverse(ListNode head) {
+                ListNode prev = null;
+                while (head != null) {
+                    ListNode next = head.next;
+                    head.next = prev;
+                    prev = head;
+                    head = next;
+                }
+                return prev;
+            }
+
+            public static void main(String[] args) {
+                ListNode head = new ListNode(2);
+                head.next = new ListNode(4);
+                head.next.next = new ListNode(6);
+                head.next.next.next = new ListNode(4);
+                head.next.next.next.next = new ListNode(2);
+                System.out.println("Is palindrome: " + PalindromicLinkedList.isPalindrome(head));
+
+                head.next.next.next.next.next = new ListNode(2);
+                System.out.println("Is palindrome: " + PalindromicLinkedList.isPalindrome(head));
+            }
+        }
+        ```
+
+* Time Complexity
+    * The above algorithm will have a time complexity of `O(N)` where `N` is the number of nodes in the `LinkedList`.
+
+* Space Complexity
+    * The algorithm runs in constant space `O(1)`.
+
+### Problem Challenge 2: Rearrange a LinkedList (medium)
+
+* Given the head of a `Singly LinkedList`, write a method to modify the `LinkedList` such that the nodes from the second half of the `LinkedList` are inserted alternately to the nodes from the first half in reverse order. So if the LinkedList has nodes `1 -> 2 -> 3 -> 4 -> 5 -> 6 -> null`, your method should return `1 -> 6 -> 2 -> 5 -> 3 -> 4 -> null.`
+
+* Your algorithm should not use any extra space and the input LinkedList should be modified in-place.
+
+* Examples
+
+    * ```
+        Input: 2 -> 4 -> 6 -> 8 -> 10 -> 12 -> null
+        Output: 2 -> 12 -> 4 -> 10 -> 6 -> 8 -> null 
+        ```
+
+    * ```
+        Input: 2 -> 4 -> 6 -> 8 -> 10 -> null
+        Output: 2 -> 10 -> 4 -> 8 -> 6 -> null
+        ```
+
+* Solution
+
+    * This problem shares similarities with `Palindrome LinkedList`. To rearrange the given `LinkedList` we will follow the following steps:
+
+        * We can use the `Fast & Slow pointers` method similar to `Middle of the LinkedList` to find the middle node of the LinkedList.
+        * Once we have the middle of the LinkedList, we will `reverse the second half of the LinkedList`.
+        * Finally, we’ll iterate through the first half and the reversed second half to produce a LinkedList in the required order.
+
+* Code
+    * `solution6.java`
+    * ```java
+        class ListNode {
+            int value = 0;
+            ListNode next;
+
+            ListNode(int value) {
+                this.value = value;
+            }
+        }
+
+        class RearrangeList {
+
+            public static void reorder(ListNode head) {
+                if (head == null || head.next == null)
+                    return;
+
+                // find the middle of the LinkedList
+                ListNode slow = head, fast = head;
+                while (fast != null && fast.next != null) {
+                    slow = slow.next;
+                    fast = fast.next.next;
+                }
+
+                // slow is now pointing to the middle node
+                ListNode headSecondHalf = reverse(slow); // reverse the second half
+                ListNode headFirstHalf = head;
+
+                // rearrange to produce the LinkedList in the required order
+                while (headFirstHalf != null && headSecondHalf != null) {
+                    ListNode temp = headFirstHalf.next;
+                    headFirstHalf.next = headSecondHalf;
+                    headFirstHalf = temp;
+
+                    temp = headSecondHalf.next;
+                    headSecondHalf.next = headFirstHalf;
+                    headSecondHalf = temp;
+                }
+
+                // set the next of the last node to 'null'
+                if (headFirstHalf != null)
+                    headFirstHalf.next = null;
+            }
+
+            private static ListNode reverse(ListNode head) {
+                ListNode prev = null;
+                while (head != null) {
+                    ListNode next = head.next;
+                    head.next = prev;
+                    prev = head;
+                    head = next;
+                }
+                return prev;
+            }
+
+            public static void main(String[] args) {
+                ListNode head = new ListNode(2);
+                head.next = new ListNode(4);
+                head.next.next = new ListNode(6);
+                head.next.next.next = new ListNode(8);
+                head.next.next.next.next = new ListNode(10);
+                head.next.next.next.next.next = new ListNode(12);
+                RearrangeList.reorder(head);
+                while (head != null) {
+                    System.out.print(head.value + " ");
+                    head = head.next;
+                }
+            }
+        }
+        ```
+
+* Time Complexity
+    * The above algorithm will have a time complexity of `O(N)` where `N` is the number of nodes in the LinkedList.
+
+* Space Complexity
+    * The algorithm runs in constant space `O(1)`.
