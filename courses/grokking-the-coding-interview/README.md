@@ -1108,7 +1108,7 @@
 
     * The algorithm runs in constant space `O(1)`.
 
-## Squaring a Sorted Array (easy)
+### Squaring a Sorted Array (easy)
 
 * Given a `sorted array`, create a new `array` containing `squares of all the numbers` of the input array in the `sorted order`.
 
@@ -1168,7 +1168,7 @@
 * Space Complexity
     * The above algorithm’s space complexity will also be `O(N)`; this space will be used for the output array.
 
-## Triplet Sum to Zero (medium)
+### Triplet Sum to Zero (medium)
 
 * Given an `array` of `unsorted numbers`, find all `unique triplets` in it that `add up` to zero.
 
@@ -1245,7 +1245,7 @@
 * Space Complexity
     * Ignoring the space required for the output array, the space complexity of the above algorithm will be `O(N)` which is required for sorting.
 
-## Triplet Sum Close to Target (medium)
+### Triplet Sum Close to Target (medium)
 
 * Given an array of `unsorted numbers` and a `target number`, find a `triplet` in the array whose `sum` is as close to the `target number` as possible, return `the sum of the triplet`. If there are more than one such triplet, return the sum of the triplet with the `smallest sum`.
 
@@ -1328,7 +1328,7 @@
 * Space Complexity
     * The above algorithm’s space complexity will be `O(N)`, which is required for sorting.
 
-## Triplets with Smaller Sum (medium)
+### Triplets with Smaller Sum (medium)
 
 * Given an array `arr` of `unsorted numbers` and a `target sum`, count `all triplets` in it such that `arr[i] + arr[j] + arr[k] < target` where `i, j, and k are three different indices`. Write a function to return the count of such triplets.
 
@@ -3554,3 +3554,284 @@
 
 * Space Complexity
     * The algorithm runs in constant space `O(1)`.
+
+### Problem Challenge 3: Cycle in a Circular Array (hard)
+
+* We are given an array containing positive and negative numbers. Suppose the array contains a number `M` at a particular index. Now, if `M` is positive we will move forward `M` indices and if `M` is negative move backwards `M` indices. You should assume that the array is circular which means two things:
+
+  * If, while moving forward, we reach the end of the array, we will jump to the first element to continue the movement. 
+  * If, while moving backward, we reach the beginning of the array, we will jump to the last element to continue the movement.
+
+* Write a method to determine if the array has a cycle. The cycle should have more than one element and should follow one direction which means the cycle should not contain both forward and backward movements.
+
+* Examples
+    * ```
+        Input: [1, 2, -1, 2, 2]
+        Output: true
+        Explanation: The array has a cycle among indices: 0 -> 1 -> 3 -> 0
+        ```
+
+    * ```
+        Input: [2, 2, -1, 2]
+        Output: true
+        Explanation: The array has a cycle among indices: 1 -> 3 -> 1
+        ```
+
+    * ```
+        Input: [2, 1, -1, -2]
+        Output: false
+        Explanation: The array does not have any cycle.
+        ```
+
+* Solution
+    * This problem involves finding a cycle in the array and, as we know, the Fast & Slow pointer method is an efficient way to do that. We can start from each index of the array to find the cycle. If a number does not have a cycle we will move forward to the next element. There are a couple of additional things we need to take care of:
+
+        * As mentioned in the problem, the cycle should have more than one element. This means that when we move a pointer forward, if the pointer points to the same element after the move, we have a one-element cycle. Therefore, we can finish our cycle search for the current element.
+        * The other requirement mentioned in the problem is that the cycle should not contain both forward and backward movements. We will handle this by remembering the direction of each element while searching for the cycle. If the number is positive, the direction will be forward and if the number is negative, the direction will be backward. So whenever we move a pointer forward, if there is a change in the direction, we will finish our cycle search right there for the current element.
+
+* Code
+    * `solution7.java`
+    * ```java
+        class CircularArrayLoop {
+
+            public static boolean loopExists(int[] arr) {
+                for (int i = 0; i < arr.length; i++) {
+                    boolean isForward = arr[i] >= 0; // if we are moving forward or not
+                    int slow = i, fast = i;
+
+                    // if slow or fast becomes '-1' this means we can't find cycle for this number
+                    do {
+                        slow = findNextIndex(arr, isForward, slow); // move one step for slow pointer
+                        fast = findNextIndex(arr, isForward, fast); // move one step for fast pointer
+                        if (fast != -1)
+                        fast = findNextIndex(arr, isForward, fast); // move another step for fast ptr
+                    } while (slow != -1 && fast != -1 && slow != fast);
+
+                    if (slow != -1 && slow == fast)
+                        return true;
+                }
+
+                return false;
+            }
+
+            private static int findNextIndex(int[] arr, boolean isForward, int currentIndex) {
+                boolean direction = arr[currentIndex] >= 0;
+                if (isForward != direction)
+                    return -1; // change in direction, return -1
+
+                int nextIndex = (currentIndex + arr[currentIndex]) % arr.length;
+                if (nextIndex < 0)
+                    nextIndex += arr.length; // wrap around for negative numbers
+
+                // one element cycle, return -1 
+                if (nextIndex == currentIndex)
+                        nextIndex = -1;
+
+                return nextIndex;
+            }
+
+            public static void main(String[] args) {
+                System.out.println(CircularArrayLoop.loopExists(new int[] { 1, 2, -1, 2, 2 }));
+                System.out.println(CircularArrayLoop.loopExists(new int[] { 2, 2, -1, 2 }));
+                System.out.println(CircularArrayLoop.loopExists(new int[] { 2, 1, -1, -2 }));
+            }
+        }
+        ```
+
+* Time Complexity
+
+    * The above algorithm will have a time complexity of `O(N^2)` where `N` is the number of elements in the array. This complexity is due to the fact that we are iterating all elements of the array and trying to find a cycle for each element.
+
+* Space Complexity
+    * The algorithm runs in constant space `O(1)`.
+  
+* An Alternate Approach
+    * In our algorithm, we don’t keep a record of all the numbers that have been evaluated for cycles. We know that all such numbers will not produce a cycle for any other instance as well. If we can remember all the numbers that have been visited, our algorithm will improve to `O(N)` as, then, each number will be evaluated for cycles only once. We can keep track of this by creating a separate array, however, in this case, the space complexity of our algorithm will increase to `O(N)`.
+
+## Pattern: Merge Intervals
+
+### Introduction
+
+* This pattern describes an efficient technique to deal with overlapping intervals. In a lot of problems involving intervals, we either need to find overlapping intervals or merge intervals if they overlap.
+
+* Given two intervals (‘a’ and ‘b’), there will be six different ways the two intervals can relate to each other:
+
+    * ![merge_interval](./images/merge_interval.png)
+
+* Understanding the above six cases will help us in solving all intervals related problems. Let’s jump onto our first problem to understand the `Merge Interval` pattern.
+
+### Merge Intervals (medium)
+
+* Given a list of intervals, **merge all the overlapping intervals** to produce a list that has only mutually exclusive intervals.
+
+* Examples
+
+    * ```
+        Intervals: [[1,4], [2,5], [7,9]]
+        Output: [[1,5], [7,9]]
+        Explanation: Since the first two intervals [1,4] and [2,5] overlap, we merged them into 
+        one [1,5].
+        ```
+
+    * ```
+        Intervals: [[6,7], [2,4], [5,9]]
+        Output: [[2,4], [5,9]]
+        Explanation: Since the intervals [6,7] and [5,9] overlap, we merged them into one [5,9].
+        ```
+    
+    * ```
+        Intervals: [[1,4], [2,6], [3,5]]
+        Output: [[1,6]]
+        Explanation: Since all the given intervals overlap, we merged them into one.
+        ```
+
+* Solution
+    * Let’s take the example of two intervals (‘a’ and ‘b’) such that `a.start <= b.start`. There are four possible scenarios:
+
+    * ![merge_interval1](./images/merge_interval1.png)
+
+    * Our goal is to merge the intervals whenever they overlap. For the above-mentioned three overlapping scenarios (2, 3, and 4), this is how we will merge them:
+
+    * ![merge_interval2](./images/merge_interval2.png)
+
+    * The diagram above clearly shows a merging approach. Our algorithm will look like this:  
+        * Sort the intervals on the start time to ensure `a.start <= b.start`
+        * If ‘a’ overlaps ‘b’ (i.e. `b.start <= a.end`), we need to merge them into a new interval ‘c’ such that:
+            * ```
+                c.start = a.start
+                c.end = max(a.end, b.end)
+                ```
+        * We will keep repeating the above two steps to merge ‘c’ with the next interval if it overlaps with ‘c’.
+
+* Code
+    * `solution1.java`
+    * ```java
+        import java.util.*;
+
+        class Interval {
+            int start;
+            int end;
+
+            public Interval(int start, int end) {
+                this.start = start;
+                this.end = end;
+            }
+        };
+
+        class MergeIntervals {
+
+            public static List<Interval> merge(List<Interval> intervals) {
+                if (intervals.size() < 2)
+                    return intervals;
+
+                // sort the intervals by start time
+                Collections.sort(intervals, (a, b) -> Integer.compare(a.start, b.start));
+
+                List<Interval> mergedIntervals = new LinkedList<Interval>();
+                Iterator<Interval> intervalItr = intervals.iterator();
+                Interval interval = intervalItr.next();
+                int start = interval.start;
+                int end = interval.end;
+
+                while (intervalItr.hasNext()) {
+                    interval = intervalItr.next();
+                    if (interval.start <= end) { // overlapping intervals, adjust the 'end'
+                        end = Math.max(interval.end, end);
+                    } else { // non-overlapping interval, add the previous interval and reset
+                        mergedIntervals.add(new Interval(start, end));
+                        start = interval.start;
+                        end = interval.end;
+                    }
+                }
+                // add the last interval
+                mergedIntervals.add(new Interval(start, end));
+
+                return mergedIntervals;
+            }
+
+            public static void main(String[] args) {
+                List<Interval> input = new ArrayList<Interval>();
+                input.add(new Interval(1, 4));
+                input.add(new Interval(2, 5));
+                input.add(new Interval(7, 9));
+                System.out.print("Merged intervals: ");
+                for (Interval interval : MergeIntervals.merge(input))
+                System.out.print("[" + interval.start + "," + interval.end + "] ");
+                System.out.println();
+
+                input = new ArrayList<Interval>();
+                input.add(new Interval(6, 7));
+                input.add(new Interval(2, 4));
+                input.add(new Interval(5, 9));
+                System.out.print("Merged intervals: ");
+                for (Interval interval : MergeIntervals.merge(input))
+                System.out.print("[" + interval.start + "," + interval.end + "] ");
+                System.out.println();
+
+                input = new ArrayList<Interval>();
+                input.add(new Interval(1, 4));
+                input.add(new Interval(2, 6));
+                input.add(new Interval(3, 5));
+                System.out.print("Merged intervals: ");
+                for (Interval interval : MergeIntervals.merge(input))
+                System.out.print("[" + interval.start + "," + interval.end + "] ");
+                System.out.println();
+            }
+        }
+        ```
+
+* Time Complexity
+    * The time complexity of the above algorithm is `O(N * logN)`, where ‘N’ is the total number of intervals. We are iterating the intervals only once which will take `O(N)`, in the beginning though, since we need to sort the intervals, our algorithm will take `O(N * logN)`.
+
+* Space Complexity
+    * The space complexity of the above algorithm will be `O(N)` as we need to return a list containing all the merged intervals. We will also need `O(N)` space for sorting. For Java, depending on its version, `Collections.sort()` either uses `Merge sort` or `Timsort`, and both these algorithms need `O(N)` space. Overall, our algorithm has a space complexity of `O(N)`.
+
+
+### Insert Interval (medium)
+
+* Given a list of non-overlapping intervals sorted by their start time, **insert a given interval at the correct position** and merge all necessary intervals to produce a list that has only mutually exclusive intervals.
+
+
+* Examples
+    * ```
+        Input: Intervals=[[1,3], [5,7], [8,12]], New Interval=[4,6]
+        Output: [[1,3], [4,7], [8,12]]
+        Explanation: After insertion, since [4,6] overlaps with [5,7], we merged them into one [4,7].
+        ```
+
+    * ```
+        Input: Intervals=[[1,3], [5,7], [8,12]], New Interval=[4,10]
+        Output: [[1,3], [4,12]]
+        Explanation: After insertion, since [4,10] overlaps with [5,7] & [8,12], we merged them into [4,12].
+        ```
+
+    * ```
+        Input: Intervals=[[2,3],[5,7]], New Interval=[1,4]
+        Output: [[1,4], [5,7]]
+        Explanation: After insertion, since [1,4] overlaps with [2,3], we merged them into one [1,4].
+        ```
+
+* Solution
+    * If the given list was not sorted, we could have simply appended the new interval to it and used the `merge()` function from `Merge Intervals`. But since the given list is sorted, we should try to come up with a solution better than `O(N * logN)`
+
+    * When inserting a new interval in a sorted list, we need to first find the correct index where the new interval can be placed. In other words, we need to skip all the intervals which `end` before the `start` of the new interval. So we can iterate through the given sorted listed of intervals and skip all the intervals with the following condition:
+
+    * `intervals[i].end < newInterval.start`
+
+    * Once we have found the correct place, we can follow an approach similar to Merge Intervals to insert and/or merge the new interval. Let’s call the new interval ‘a’ and the first interval with the above condition ‘b’. There are five possibilities:
+
+    * ![merge_interval](./images/merge_internal3.png)
+
+    * The diagram above clearly shows the merging approach. To handle all four merging scenarios, we need to do something like this:
+
+    * ```
+        c.start = min(a.start, b.start)
+        c.end = max(a.end, b.end)
+        ```
+    
+    * Our overall algorithm will look like this:
+
+        * Skip all intervals which end before the start of the new interval, i.e., skip all `intervals` with the following condition: 
+            * `intervals[i].end < newInterval.start`
+        * Let’s call the last interval ‘b’ that does not satisfy the above condition. If ‘b’ overlaps with the new interval (a) (i.e. `b.start <= a.end`), we need to merge them into a new interval ‘c’:
+            * 
