@@ -3834,4 +3834,195 @@
         * Skip all intervals which end before the start of the new interval, i.e., skip all `intervals` with the following condition: 
             * `intervals[i].end < newInterval.start`
         * Let’s call the last interval ‘b’ that does not satisfy the above condition. If ‘b’ overlaps with the new interval (a) (i.e. `b.start <= a.end`), we need to merge them into a new interval ‘c’:
-            * 
+            * ```
+                c.start = min(a.start, b.start)
+                c.end = max(a.end, b.end)
+                ```
+        * We will repeat the above two steps to merge ‘c’ with the next overlapping interval.
+
+* Code
+    * `solution2.java`
+    * ```java
+        import java.util.*;
+
+        class Interval {
+            int start;
+            int end;
+
+            public Interval(int start, int end) {
+                this.start = start;
+                this.end = end;
+            }
+        };
+
+        class InsertInterval {
+
+            public static List<Interval> insert(List<Interval> intervals, Interval newInterval) {
+                if (intervals == null || intervals.isEmpty())
+                return Arrays.asList(newInterval);
+
+                List<Interval> mergedIntervals = new ArrayList<>();
+
+                int i = 0;
+                // skip (and add to output) all intervals that come before the 'newInterval'
+                while (i < intervals.size() && intervals.get(i).end < newInterval.start)
+                    mergedIntervals.add(intervals.get(i++));
+
+                // merge all intervals that overlap with 'newInterval'
+                while (i < intervals.size() && intervals.get(i).start <= newInterval.end) {
+                    newInterval.start = Math.min(intervals.get(i).start, newInterval.start);
+                    newInterval.end = Math.max(intervals.get(i).end, newInterval.end);
+                    i++;
+                }
+
+                // insert the newInterval
+                mergedIntervals.add(newInterval);
+
+                // add all the remaining intervals to the output
+                while (i < intervals.size())
+                    mergedIntervals.add(intervals.get(i++));
+
+                return mergedIntervals;
+            }
+
+            public static void main(String[] args) {
+                List<Interval> input = new ArrayList<Interval>();
+                input.add(new Interval(1, 3));
+                input.add(new Interval(5, 7));
+                input.add(new Interval(8, 12));
+                System.out.print("Intervals after inserting the new interval: ");
+                for (Interval interval : InsertInterval.insert(input, new Interval(4, 6)))
+                System.out.print("[" + interval.start + "," + interval.end + "] ");
+                System.out.println();
+
+                input = new ArrayList<Interval>();
+                input.add(new Interval(1, 3));
+                input.add(new Interval(5, 7));
+                input.add(new Interval(8, 12));
+                System.out.print("Intervals after inserting the new interval: ");
+                for (Interval interval : InsertInterval.insert(input, new Interval(4, 10)))
+                System.out.print("[" + interval.start + "," + interval.end + "] ");
+                System.out.println();
+
+                input = new ArrayList<Interval>();
+                input.add(new Interval(2, 3));
+                input.add(new Interval(5, 7));
+                System.out.print("Intervals after inserting the new interval: ");
+                for (Interval interval : InsertInterval.insert(input, new Interval(1, 4)))
+                System.out.print("[" + interval.start + "," + interval.end + "] ");
+                System.out.println();
+            }
+        }
+        ```
+
+* Time Complexity
+    * As we are iterating through all the intervals only once, the time complexity of the above algorithm is `O(N)`, where `N` is the total number of intervals.
+
+
+* Space Complexity
+    * The space complexity of the above algorithm will be `O(N)` as we need to return a list containing all the merged intervals.
+
+### Intervals Intersection (medium)
+
+* Given two lists of intervals, find the intersection of these two lists. Each list consists of disjoint intervals sorted on their start time.
+
+* Examples
+
+    * ```
+        Input: arr1=[[1, 3], [5, 6], [7, 9]], arr2=[[2, 3], [5, 7]]
+        Output: [2, 3], [5, 6], [7, 7]
+        Explanation: The output list contains the common intervals between the two lists.
+        ```
+
+    * ```
+        Input: arr1=[[1, 3], [5, 7], [9, 12]], arr2=[[5, 10]]
+        Output: [5, 7], [9, 10]
+        Explanation: The output list contains the common intervals between the two lists.
+        ```
+
+* Solution
+    * This problem follows the Merge Intervals pattern. As we have discussed under Insert Interval, there are five overlapping possibilities between two intervals ‘a’ and ‘b’. A close observation will tell us that whenever the two intervals overlap, one of the interval’s start time lies within the other interval. This rule can help us identify if any two intervals overlap or not.
+
+    * ![merge_interval](./images/merge_internal4.png)
+
+    * Now, if we have found that the two intervals overlap, how can we find the overlapped part?
+
+    * Again from the above diagram, the overlapping interval will be equal to:
+
+    * ```
+        start = max(a.start, b.start)
+        end = min(a.end, b.end) 
+        ```
+    
+    * That is, the highest start time and the lowest end time will be the overlapping interval.
+
+    * So our algorithm will be to iterate through both the lists together to see if any two intervals overlap. If two intervals overlap, we will insert the overlapped part into a result list and move on to the next interval which is finishing early.
+
+* Code
+    * `solution3.java`
+    * ```java
+        import java.util.*;
+
+        class Interval {
+            int start;
+            int end;
+
+            public Interval(int start, int end) {
+                this.start = start;
+                this.end = end;
+            }
+        };
+
+        class IntervalsIntersection {
+
+            public static Interval[] merge(Interval[] arr1, Interval[] arr2) {
+                List<Interval> result = new ArrayList<Interval>();
+                int i = 0, j = 0;
+                while (i < arr1.length && j < arr2.length) {
+                    // check if the interval arr[i] intersects with arr2[j]
+                    // check if one of the interval's start time lies within the other interval
+                    if ((arr1[i].start >= arr2[j].start && arr1[i].start <= arr2[j].end)
+                        || (arr2[j].start >= arr1[i].start && arr2[j].start <= arr1[i].end)) {
+                        // store the intersection part
+                        result.add(new Interval(Math.max(arr1[i].start, arr2[j].start), 
+                                                Math.min(arr1[i].end, arr2[j].end)));
+                    }
+
+                    // move next from the interval which is finishing first
+                    if (arr1[i].end < arr2[j].end)
+                        i++;
+                    else
+                        j++;
+                }
+
+                return result.toArray(new Interval[result.size()]);
+            }
+
+            public static void main(String[] args) {
+                Interval[] input1 = new Interval[] { new Interval(1, 3), new Interval(5, 6), 
+                                                    new Interval(7, 9) };
+                Interval[] input2 = new Interval[] { new Interval(2, 3), new Interval(5, 7) };
+                Interval[] result = IntervalsIntersection.merge(input1, input2);
+                System.out.print("Intervals Intersection: ");
+                for (Interval interval : result)
+                    System.out.print("[" + interval.start + "," + interval.end + "] ");
+                System.out.println();
+
+                input1 = new Interval[] { new Interval(1, 3), new Interval(5, 7), 
+                                        new Interval(9, 12) };
+                input2 = new Interval[] { new Interval(5, 10) };
+                result = IntervalsIntersection.merge(input1, input2);
+                System.out.print("Intervals Intersection: ");
+                for (Interval interval : result)
+                    System.out.print("[" + interval.start + "," + interval.end + "] ");
+            }
+        }
+        ```
+
+* Time Complexity
+
+    * As we are iterating through both the lists once, the time complexity of the above algorithm is `O(N + M)`, where ‘N’ and ‘M’ are the total number of intervals in the input arrays respectively.
+
+* Space Complexity
+
+    * Ignoring the space needed for the result list, the algorithm runs in constant space `O(1)`.
