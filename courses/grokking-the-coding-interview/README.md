@@ -4351,3 +4351,247 @@
 
 * Space Complexity
     * The space complexity of the above algorithm will be `O(N)`, which is required for sorting. Also, in the worst case, we have to insert all the jobs into the priority queue (when all jobs overlap) which will also take `O(N)` space. The overall space complexity of our algorithm is `O(N)`.
+
+### Problem Challenge 3: Employee Free Time (hard) 
+
+* For `K` employees, we are given a `list of intervals` representing each `employee’s working hours`. Our goal is to determine if there is a `free interval which is common to all employees`. You can assume that each list of employee working hours is sorted on the start time.
+
+* Examples
+    * ```
+        Input: Employee Working Hours=[[[1,3], [5,6]], [[2,3], [6,8]]]
+        Output: [3,5]
+        Explanation: All the employees are free between [3,5].
+        ```
+    * ```
+        Input: Employee Working Hours=[[[1,3], [9,12]], [[2,4]], [[6,8]]]
+        Output: [4,6], [8,9]
+        Explanation: All employees are free between [4,6] and [8,9].
+        ```
+    * ```
+        Input: Employee Working Hours=[[[1,3]], [[2,4]], [[3,5], [7,9]]]
+        Output: [5,7]
+        Explanation: All employees are free between [5,7].
+        ```
+
+* Solution
+    * This problem follows the Merge Intervals pattern. Let’s take the above-mentioned example (2) and visually draw it:
+    * ```
+        Input: Employee Working Hours=[[[1,3], [9,12]], [[2,4]], [[6,8]]]
+        Output: [4,6], [8,9]
+        ```
+    * One simple solution can be to put all employees’ working hours in a list and sort them on the start time. Then we can iterate through the list to find the gaps. Let’s dig deeper. Sorting the intervals of the above example will give us:
+        * `[1,3], [2,4], [6,8], [9,12]`
+    
+    * We can now iterate through these intervals, and whenever we find non-overlapping intervals (e.g., [2,4] and [6,8]), we can calculate a free interval (e.g., [4,6]). This algorithm will take `O(N * logN)` time, where ‘N’ is the total number of intervals. This time is needed because we need to sort all the intervals. The space complexity will be `O(N)`, which is needed for sorting. Can we find a better solution?
+
+    * **Using a Heap to Sort the Intervals**
+        * One fact that we are not utilizing is that each employee list is individually sorted!
+
+        * How about we take the first interval of each employee and insert it in a `Min Heap`. This `Min Heap` can always give us the interval with the smallest start time. Once we have the smallest start-time interval, we can then compare it with the next smallest start-time interval (again from the `Heap`) to find the gap. This interval comparison is similar to what we suggested in the previous approach.
+
+        * Whenever we take an interval out of the `Min Heap`, we can insert the same employee’s next interval. This also means that we need to know which interval belongs to which employee.
+
+* Code
+    * `solution7.java`
+    * ```java
+        import java.util.*;
+
+        class Interval {
+            int start;
+            int end;
+
+            public Interval(int start, int end) {
+                this.start = start;
+                this.end = end;
+            }
+        };
+
+        class EmployeeInterval {
+            Interval interval; // interval representing employee's working hours 
+            int employeeIndex; // index of the list containing working hours of this employee
+            int intervalIndex; // index of the interval in the employee list
+
+            public EmployeeInterval(Interval interval, int employeeIndex, int intervalIndex) {
+                this.interval = interval;
+                this.employeeIndex = employeeIndex;
+                this.intervalIndex = intervalIndex;
+            }
+        };
+
+        class EmployeeFreeTime {
+
+            public static List<Interval> findEmployeeFreeTime(List<List<Interval>> schedule) {
+                List<Interval> result = new ArrayList<>();
+                // PriorityQueue to store one interval from each employee
+                PriorityQueue<EmployeeInterval> minHeap = new PriorityQueue<>(
+                    (a, b) -> Integer.compare(a.interval.start, b.interval.start));
+
+                // insert the first interval of each employee to the queue
+                for (int i = 0; i < schedule.size(); i++)
+                    minHeap.offer(new EmployeeInterval(schedule.get(i).get(0), i, 0));
+
+                Interval previousInterval = minHeap.peek().interval;
+                while (!minHeap.isEmpty()) {
+                    EmployeeInterval queueTop = minHeap.poll();
+                    // if previousInterval is not overlapping with the next interval, insert a free 
+                    // interval
+                    if (previousInterval.end < queueTop.interval.start) {
+                        result.add(new Interval(previousInterval.end, queueTop.interval.start));
+                        previousInterval = queueTop.interval;
+                    } else { // overlapping intervals, update the previousInterval if needed
+                        if (previousInterval.end < queueTop.interval.end)
+                        previousInterval = queueTop.interval;
+                    }
+
+                    // if there are more intervals available for the same employee, add their next 
+                    // interval
+                    List<Interval> employeeSchedule = schedule.get(queueTop.employeeIndex);
+                    if (employeeSchedule.size() > queueTop.intervalIndex + 1) {
+                        minHeap.offer(new EmployeeInterval(
+                            employeeSchedule.get(queueTop.intervalIndex + 1), queueTop.employeeIndex,
+                            queueTop.intervalIndex + 1));
+                    }
+                }
+
+                return result;
+            }
+
+            public static void main(String[] args) {
+
+                List<List<Interval>> input = new ArrayList<>();
+                input.add(new ArrayList<Interval>(Arrays.asList(new Interval(1, 3), 
+                                                                new Interval(5, 6))));
+                input.add(new ArrayList<Interval>(Arrays.asList(new Interval(2, 3), 
+                                                                new Interval(6, 8))));
+                List<Interval> result = EmployeeFreeTime.findEmployeeFreeTime(input);
+                System.out.print("Free intervals: ");
+                for (Interval interval : result)
+                System.out.print("[" + interval.start + ", " + interval.end + "] ");
+                System.out.println();
+
+                input = new ArrayList<>();
+                input.add(new ArrayList<Interval>(Arrays.asList(new Interval(1, 3), 
+                                                                new Interval(9, 12))));
+                input.add(new ArrayList<Interval>(Arrays.asList(new Interval(2, 4))));
+                input.add(new ArrayList<Interval>(Arrays.asList(new Interval(6, 8))));
+                result = EmployeeFreeTime.findEmployeeFreeTime(input);
+                System.out.print("Free intervals: ");
+                for (Interval interval : result)
+                System.out.print("[" + interval.start + ", " + interval.end + "] ");
+                System.out.println();
+
+                input = new ArrayList<>();
+                input.add(new ArrayList<Interval>(Arrays.asList(new Interval(1, 3))));
+                input.add(new ArrayList<Interval>(Arrays.asList(new Interval(2, 4))));
+                input.add(new ArrayList<Interval>(Arrays.asList(new Interval(3, 5), 
+                                                                new Interval(7, 9))));
+                result = EmployeeFreeTime.findEmployeeFreeTime(input);
+                System.out.print("Free intervals: ");
+                for (Interval interval : result)
+                System.out.print("[" + interval.start + ", " + interval.end + "] ");
+            }
+        }
+        ```
+
+* Time Complexity
+    * The above algorithm’s time complexity is `O(N*logK)`, where `N` is the total number of intervals, and `K` is the total number of employees. This is because we are iterating through the intervals only once (which will take `O(N)`), and every time we process an interval, we remove (and can insert) one interval in the `Min Heap`, (which will take `O(logK)`). At any time, the heap will not have more than `K` elements.
+
+* Space Complexity
+    * The space complexity of the above algorithm will be `O(K)` as at any time, the heap will not have more than `K` elements.
+
+
+## Pattern: Cyclic Sort
+
+### Introduction
+
+* This pattern describes an interesting approach to deal with problems involving arrays containing numbers in a given range. For example, take the following problem:
+
+* ```
+    You are given an unsorted array containing n numbers taken from the range 1 to n. 
+    The array can have duplicates, which means that some numbers will be missing. Find all the missing numbers.
+    ```
+
+* To efficiently solve this problem, we can use the fact that the input array contains numbers in the range of `1` to `n`. For example, to efficiently sort the array, we can try placing each number at its correct place, i.e., placing `1` at index `0`, placing `2` at index `1`, and so on. Once we are done with the sorting, we can iterate the array to find all indices missing the correct numbers. These will be our required numbers.
+
+* Let’s jump on to our first problem to understand the `Cyclic Sort` pattern in detail.
+
+### Cyclic Sort (easy)
+
+* We are given an array containing `n` objects. Each object, when created, was assigned a `unique number` from the range `1` to `n` based on their creation sequence. This means that the object with sequence number `3` was created just before the object with sequence number `4`.
+
+* Write a function to sort the objects in-place on their creation sequence number in `O(n)` and without using any extra space. For simplicity, let’s assume we are passed an `integer array` containing only the sequence numbers, though each number is actually an object.
+
+* Examples
+    * ```
+        Input: [3, 1, 5, 4, 2]
+        Output: [1, 2, 3, 4, 5]
+        ```
+    * ```
+        Input: [2, 6, 4, 3, 1, 5]
+        Output: [1, 2, 3, 4, 5, 6]
+        ```
+    * ```
+        Input: [1, 5, 6, 4, 3, 2]
+        Output: [1, 2, 3, 4, 5, 6]
+        ```
+
+* Solution
+    * As we know, the input array contains numbers from the range `1` to `n`. We can use this fact to devise an efficient way to sort the numbers. Since all numbers are `unique`, we can try placing each number at its `correct place`, i.e., placing `1` at index `0`, placing `2` at index `1`, and so on.
+
+    * To place a number (or an object in general) at its correct index, we first need to find that number. If we first find a number and then place it at its correct place, it will take us `O(N^2)`, which is not acceptable.
+
+    * Instead, what if we iterate the array one number at a time, and if the current number we are iterating is not at the correct index, we `swap` it with the number at its correct index. This way, we will go through all numbers and place them at their correct indices, hence, sorting the whole array.
+
+    * Let’s see this visually with the above-mentioned Example-2:
+
+    * ![cyclic_sort](./images/cyclic_sort.png)
+
+* Code
+    * `solution1.java`
+    * ```java
+        class CyclicSort {
+
+            public static void sort(int[] nums) {
+                int i = 0;
+                while (i < nums.length) {
+                    int j = nums[i] - 1;
+                    if (nums[i] != nums[j])
+                        swap(nums, i, j);
+                    else
+                        i++;
+                }
+            }
+
+            private static void swap(int[] arr, int i, int j) {
+                int temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+            }
+
+            public static void main(String[] args) {
+                int[] arr = new int[] { 3, 1, 5, 4, 2 };
+                CyclicSort.sort(arr);
+                for (int num : arr)
+                System.out.print(num + " ");
+                System.out.println();
+
+                arr = new int[] { 2, 6, 4, 3, 1, 5 };
+                CyclicSort.sort(arr);
+                for (int num : arr)
+                System.out.print(num + " ");
+                System.out.println();
+
+                arr = new int[] { 1, 5, 6, 4, 3, 2 };
+                CyclicSort.sort(arr);
+                for (int num : arr)
+                System.out.print(num + " ");
+                System.out.println();
+            }
+        }
+        ```
+
+* Time Complexity
+    * The time complexity of the above algorithm is `(n)`. Although we are not incrementing the index `i` when swapping the numbers, this will result in more than `n` iterations of the loop, but in the worst-case scenario, the while loop will `swap` a total of `n-1` numbers, and once a number is at its correct index, we will move on to the next number by incrementing i. So overall, our algorithm will take `O(n) + O(n-1)` which is asymptotically equivalent to `O(n)`.
+
+* Space Complexity
+    * The algorithm runs in constant space `O(1)`.
