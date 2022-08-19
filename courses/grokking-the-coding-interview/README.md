@@ -4736,3 +4736,119 @@
 
 * Space Complexity
     * Ignoring the space required for the output array, the algorithm runs in constant space `O(1)`.
+
+### Find the Duplicate Number (easy)
+
+* We are given an `unsorted array` containing `n+1` numbers taken from the range `1` to `n`. The array has only `one duplicate` but it can be `repeated multiple times`. Find that duplicate number `without using any extra space`. You are, however, allowed to modify the input array.
+
+* Examples
+    * ```
+        Input: [1, 4, 4, 3, 2]
+        Output: 4
+        ```
+    * ```
+        Input: [2, 1, 3, 3, 5, 4]
+        Output: 3
+        ```
+    * ```
+        Input: [2, 4, 1, 4, 4]
+        Output: 4
+        ```
+
+* Solution
+    * This problem follows the `Cyclic Sort` pattern and shares similarities with `Find the Missing Number`. Following a similar approach, we will try to place each number on its correct index. Since there is only one duplicate, if while swapping the number with its index both the numbers being swapped are same, we have found our duplicate!
+
+* Code
+    * `solution4.java`
+    * ```java
+        class FindDuplicate {
+
+            public static int findNumber(int[] nums) {
+                int i = 0;
+                while (i < nums.length) {
+                    if (nums[i] != i + 1) {
+                        if (nums[i] != nums[nums[i] - 1])
+                        swap(nums, i, nums[i] - 1);
+                        else // we have found the duplicate
+                        return nums[i];
+                    } else {
+                        i++;
+                    }
+                }
+
+                return -1;
+            }
+
+            private static void swap(int[] arr, int i, int j) {
+                int temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+            }
+
+            public static void main(String[] args) {
+                System.out.println(FindDuplicate.findNumber(new int[] { 1, 4, 4, 3, 2 }));
+                System.out.println(FindDuplicate.findNumber(new int[] { 2, 1, 3, 3, 5, 4 }));
+                System.out.println(FindDuplicate.findNumber(new int[] { 2, 4, 1, 4, 4 }));
+            }
+        }
+        ```
+
+* Time Complexity
+    * The time complexity of the above algorithm is `O(n)`.
+
+* Space Complexity
+    * The algorithm runs in constant space `O(1)` but modifies the input array.
+
+### Find all Duplicate Numbers (easy)
+
+* We are given an unsorted array containing `n` numbers taken from the range `1` to `n`. The array has some numbers appearing twice, `find all these duplicate numbers` using constant space.
+
+* Solution
+    * This problem follows the `Cyclic Sort` pattern and shares similarities with `Find the Duplicate Number`. Following a similar approach, we will place each number at its correct index. After that, we will iterate through the array to find all numbers that are not at the correct indices. All these numbers are duplicates.
+
+* Code
+    * `solution5.java`
+    * ```java
+        import java.util.*;
+
+        class FindAllDuplicate {
+
+            public static List<Integer> findNumbers(int[] nums) {
+                int i = 0;
+                while (i < nums.length) {
+                    if (nums[i] != nums[nums[i] - 1])
+                        swap(nums, i, nums[i] - 1);
+                    else
+                        i++;
+                }
+
+                List<Integer> duplicateNumbers = new ArrayList<>();
+                for (i = 0; i < nums.length; i++) {
+                    if (nums[i] != i + 1)
+                        duplicateNumbers.add(nums[i]);
+                }
+
+                return duplicateNumbers;
+            }
+
+            private static void swap(int[] arr, int i, int j) {
+                int temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+            }
+
+            public static void main(String[] args) {
+                List<Integer> duplicates = FindAllDuplicate.findNumbers(new int[] { 3, 4, 4, 5, 5 });
+                System.out.println("Duplicates are: " + duplicates);
+
+                duplicates = FindAllDuplicate.findNumbers(new int[] { 5, 4, 7, 2, 3, 5, 3 });
+                System.out.println("Duplicates are: " + duplicates);
+            }
+        }
+        ```
+
+* Time Complexity
+    * The time complexity of the above algorithm is `O(n)`.
+
+* Space Complexity
+    * Ignoring the space required for storing the duplicates, the algorithm runs in constant space `O(1)`.
