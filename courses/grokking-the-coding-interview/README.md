@@ -4852,3 +4852,138 @@
 
 * Space Complexity
     * Ignoring the space required for storing the duplicates, the algorithm runs in constant space `O(1)`.
+
+### Problem Challenge 1: Find the Corrupt Pair (easy)
+
+* We are given an `unsorted array` containing `n` numbers taken from the range `1` to `n`. The array originally contained all the numbers from `1` to `n`, but due to a data error, `one of the numbers got duplicated` which also resulted in `one number going missing`. Find both these numbers.
+
+* Examples
+    * ```
+        Input: [3, 1, 2, 5, 2]
+        Output: [2, 4]
+        Explanation: '2' is duplicated and '4' is missing.
+        ```
+    * ```
+        Input: [3, 1, 2, 3, 6, 4]
+        Output: [3, 5]
+        Explanation: '3' is duplicated and '5' is missing.
+        ```
+
+* Solution
+    * This problem follows the `Cyclic Sort` pattern and shares similarities with Find all Duplicate Numbers. Following a similar approach, we will place each number at its correct index. Once we are done with the cyclic sort, we will iterate through the array to find the number that is not at the correct index. Since only one number got corrupted, the number at the wrong index is the duplicated number and the index itself represents the missing number.
+
+* Code
+    * `solution6.java`
+    * ```java
+        class FindCorruptNums {
+
+            public static int[] findNumbers(int[] nums) {
+                int i = 0;
+                while (i < nums.length) {
+                    if (nums[i] != nums[nums[i] - 1])
+                        swap(nums, i, nums[i] - 1);
+                    else
+                        i++;
+                }
+
+                for (i = 0; i < nums.length; i++)
+                    if (nums[i] != i + 1)
+                        return new int[] { nums[i], i + 1 };
+
+                return new int[] { -1, -1 };
+            }
+
+            private static void swap(int[] arr, int i, int j) {
+                int temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+            }
+
+            public static void main(String[] args) {
+                int[] nums = FindCorruptNums.findNumbers(new int[] { 3, 1, 2, 5, 2 });
+                System.out.println(nums[0] + ", " + nums[1]);
+                nums = FindCorruptNums.findNumbers(new int[] { 3, 1, 2, 3, 6, 4 });
+                System.out.println(nums[0] + ", " + nums[1]);
+            }
+        }
+        ```
+
+* Time Complexity
+    * The time complexity of the above algorithm is `O(n)`
+
+* Space Complexity
+    * The algorithm runs in constant space `O(1)`.
+
+### Problem Challenge 2: Find the Smallest Missing Positive Number (medium)
+
+* Given an `unsorted array` containing numbers, find the `smallest` missing positive number in it.
+
+* Note: Positive numbers start from `1`.
+
+* Examples
+    * ```
+        Input: [-3, 1, 5, 4, 2]
+        Output: 3
+        Explanation: The smallest missing positive number is '3'
+        ```
+    * ```
+        Input: [3, -2, 0, 1, 2]
+        Output: 4
+        ```
+    * ```
+        Input: [3, 2, 5, 1]
+        Output: 4
+        ```
+    * ```
+        Input: [33, 37, 5]
+        Output: 1
+        ```
+
+* Solution
+    * This problem follows the `Cyclic Sort` pattern and shares similarities with Find the Missing Number with one big difference. In this problem, the numbers are not bound by any range so we can have any number in the input array.
+
+    * However, we will follow a similar approach though as discussed in `Find the Missing Number` to place the numbers on their correct indices and ignore all numbers that are out of the range of the array (i.e., all negative numbers and all numbers greater than the length of the array). Once we are done with the cyclic sort we will iterate the array and the first index that does not have the correct number will be the smallest missing positive number!
+
+* Code
+    * `solution7.java`
+    * ```java
+        class FirstSmallestMissingPositive {
+
+            public static int findNumber(int[] nums) {
+                int i = 0;
+                while (i < nums.length) {
+                    if (nums[i] > 0 && nums[i] <= nums.length && nums[i] != nums[nums[i] - 1])
+                        swap(nums, i, nums[i] - 1);
+                    else
+                        i++;
+                }
+                
+                for (i = 0; i < nums.length; i++)
+                    if (nums[i] != i + 1)
+                        return i + 1;
+
+                return nums.length + 1;
+            }
+
+            private static void swap(int[] arr, int i, int j) {
+                int temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+            }
+
+            public static void main(String[] args) {
+                System.out.println(
+                    FirstSmallestMissingPositive.findNumber(new int[] { -3, 1, 5, 4, 2 }));
+                System.out.println(
+                    FirstSmallestMissingPositive.findNumber(new int[] { 3, -2, 0, 1, 2 }));
+                System.out.println(
+                    FirstSmallestMissingPositive.findNumber(new int[] { 3, 2, 5, 1 }));
+            }
+        }
+        ```
+
+* Time Complexity
+    * The time complexity of the above algorithm is `O(n)`.
+
+* Space Complexity
+    * The algorithm runs in constant space `O(1)`.
