@@ -9,45 +9,49 @@ class ReverseEveryKElementSubList {
         }
     }
 
-    public static <T> void reverseKSubList(Node<T> head, int k) {
-
-        
-        Node<T> start = null;
+    public static <T> void reverseLinkedList(Node<T> head, Node<T> tail) {
         Node<T> node = head;
         Node<T> prev = null;
-        int counter = 0;
-        
-        
-        // 1,2,3,   4,5,6,7,8,9
-        // 3 -> 2 -> 1 -> null
-        // 1
-        while (node != null) {
+        while (prev != tail) {
             Node<T> next = node.next;
             node.next = prev;
             prev = node;
             node = next;
+        }
+    }
 
-            counter++;
+    public static <T> Node<T> reverseKSubList(Node<T> head, int k) {
+        int counter = 0;
+        Node<T> node = head;
+        Node<T> listHead = null;
+        Node<T> currentHead = null;
+        Node<T> currentTail = null;
+        Node<T> newTail = null;
 
-            if (counter == k) {
-
-                //System.out.print(node);
-
-                counter = -1;
-                if (start == null) {
-                    start = head;
-                    head = prev;
-                    
-                } else {
-                    start.next = prev;
-                    start = prev;
-                }
-
-                prev = null;
+        // O(N*2)
+        while (node.next != null) {
+            if (counter == 0) currentHead = node;
+            else if (counter == k-1) {
+                currentTail = node;
+                if (newTail != null) newTail.next = currentTail;
+                
+                node = currentTail.next;
+                reverseLinkedList(currentHead, currentTail);   
+                newTail = currentHead;
+                if (listHead == null) listHead = currentTail;
+                counter = 0;
+                continue;
             }
+            counter++;
+            node = node.next;
         }
 
-        printList(head);
+        if (counter > 0) {
+            currentTail = node;
+            if (newTail != null) newTail.next = currentTail;
+            reverseLinkedList(currentHead, currentTail);   
+        }
+        return listHead;
     }
     public static void main(String[] args) {
         Node<Integer> node = new Node<Integer>(1);
@@ -59,8 +63,10 @@ class ReverseEveryKElementSubList {
         node.next.next.next.next.next.next = new Node<Integer>(7);
         node.next.next.next.next.next.next.next = new Node<Integer>(8);
         node.next.next.next.next.next.next.next.next = new Node<Integer>(9);
+        node.next.next.next.next.next.next.next.next.next = new Node<Integer>(10);
+        node.next.next.next.next.next.next.next.next.next.next = new Node<Integer>(11);
 
-        reverseKSubList(node, 3);
+        printList(reverseKSubList(node, 3));
     }
 }
 
